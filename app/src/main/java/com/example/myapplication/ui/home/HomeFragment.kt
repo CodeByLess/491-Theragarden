@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import com.example.myapplication.Profile
 import com.example.myapplication.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -33,6 +35,15 @@ class HomeFragment : Fragment() {
             textView.text = it
         }
         return root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.btnProfile.setOnClickListener {
+            val intent = Intent(requireContext(), Profile::class.java)
+            startActivity(intent)
+        }
     }
 
     override fun onDestroyView() {

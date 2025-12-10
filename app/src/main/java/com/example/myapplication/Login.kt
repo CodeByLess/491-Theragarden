@@ -31,17 +31,16 @@ class Login : AppCompatActivity() {
             val email = binding.email.text.toString()
             val pass = binding.password.text.toString()
 
-            if (email.isNotEmpty() && pass.isNotEmpty()){
-                firebaseAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener{
-                    if (it.isSuccessful){
+            if (email.isNotEmpty() && pass.isNotEmpty()) {
+                firebaseAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener {
+                    if (it.isSuccessful) {
                         val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
-                    }else{
+                    } else {
                         Toast.makeText(this, it.exception.toString(), Toast.LENGTH_SHORT).show()
                     }
                 }
-            }
-            else{
+            } else {
                 Toast.makeText(this, "Empty Fields not allowed", Toast.LENGTH_SHORT).show()
             }
         }
@@ -50,14 +49,6 @@ class Login : AppCompatActivity() {
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
-        }
-    }
-    override fun onStart() {
-        super.onStart()
-
-        if(firebaseAuth.currentUser != null){
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
         }
     }
 }
