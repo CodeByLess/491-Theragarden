@@ -38,10 +38,7 @@ class Profile : AppCompatActivity() {
         val btnDelete = findViewById<Button>(R.id.delete)
 
         // --- 2. SETUP TEXT FIELDS ---
-        tvFullName = findViewById(R.id.tvFirstName)
-        tvDob = findViewById(R.id.tvDob)
-        tvEmail = findViewById(R.id.tvEmail)
-        tvCountry = findViewById(R.id.tvCountry)
+
 
         // Load data on start
         loadUserInfo()
@@ -51,10 +48,10 @@ class Profile : AppCompatActivity() {
         btnBack.setOnClickListener { finish() }
 
         btnEdit.setOnClickListener {
-            val intent = Intent(this, ProfileEdit::class.java)
-            intent.putExtra("firstName", tvFullName.text.toString())
+            val intent = Intent(this, ProfileEditPage::class.java)
             startActivity(intent)
         }
+
 
         btnDelete.setOnClickListener {
             // DEBUG MSG: If you don't see this pop up, your button ID is wrong!
