@@ -7,75 +7,39 @@
     android:layout_height="match_parent"
     tools:context=".ProfileEdit">
 
-    <Button
-        android:id="@+id/ChangePassword"
+    <EditText
+        android:id="@+id/etFirstName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_margin="16dp"
-        android:text="change password"
-        tools:layout_editor_absoluteX="195dp"
-        tools:layout_editor_absoluteY="241dp" />
+        android:ems="10"
+        android:inputType="text"
+        android:text="First Name"
+        tools:layout_editor_absoluteX="100dp"
+        tools:layout_editor_absoluteY="219dp" />
 
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/password"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        tools:layout_editor_absoluteX="-16dp"
-        tools:layout_editor_absoluteY="214dp" />
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/email"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="134dp" />
-
-    <Button
-        android:id="@+id/backProfile"
+    <EditText
+        android:id="@+id/etLastName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_margin="16dp"
-        android:text="@string/back"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp" />
+        android:ems="10"
+        android:inputType="text"
+        android:text="Last Name"
+        tools:layout_editor_absoluteX="100dp"
+        tools:layout_editor_absoluteY="280dp" />
 
     <Button
-        android:id="@+id/SaveProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_margin="16dp"
-        android:text="save"
-        tools:layout_editor_absoluteX="161dp"
-        tools:layout_editor_absoluteY="382dp" />
+        android:id="@+id/btnSave"
+        android:layout_width="135dp"
+        android:layout_height="50dp"
+        android:text="Save"
+        tools:layout_editor_absoluteX="36dp"
+        tools:layout_editor_absoluteY="343dp" />
 
     <Button
-        android:id="@+id/ChangeEmail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_margin="16dp"
-        android:text="change email"
-        tools:layout_editor_absoluteX="241dp"
-        tools:layout_editor_absoluteY="161dp" />
-
-    <Button
-        android:id="@+id/DeleteAccount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_margin="16dp"
-        android:text="delete account"
-        tools:layout_editor_absoluteX="134dp"
-        tools:layout_editor_absoluteY="453dp" />
+        android:id="@+id/btnCancel"
+        android:layout_width="146dp"
+        android:layout_height="48dp"
+        android:text="Cancel"
+        tools:layout_editor_absoluteX="194dp"
+        tools:layout_editor_absoluteY="343dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>
