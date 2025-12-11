@@ -29,10 +29,10 @@
     <string name="profile">Profile</string>
     <string name="edit_profile">edit profile</string>
     <string name="delete_profile">delete profile</string>
-    <string name="back">back</string>
-    <string name="change_email">change email</string>
-    <string name="change_password">change password</string>
+    <string name="delete">delete account</string>
     <string name="save">save</string>
-    <string name="delete_account">delete account</string>
+    <string name="change_password">change password</string>
+    <string name="change_email">change email</string>
+    <string name="back">back</string>
 
 </resources>
