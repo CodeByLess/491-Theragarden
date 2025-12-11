@@ -6,6 +6,157 @@
     android:layout_height="match_parent"
     tools:context=".ui.dashboard.DashboardFragment">
 
+
+    <Button
+        android:id="@+id/btnLinks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="160dp"
+        android:text="Links to Resources"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnMood"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Mood"
+        app:layout_constraintTop_toBottomOf="@id/btnLinks"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnSleep" />
+
+
+    <Button
+        android:id="@+id/btnSleep"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Sleep"
+        app:layout_constraintTop_toBottomOf="@id/btnLinks"
+        app:layout_constraintStart_toEndOf="@id/btnMood"
+        app:layout_constraintEnd_toStartOf="@id/btnHydration" />
+
+
+    <Button
+        android:id="@+id/btnHydration"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Hydration"
+        app:layout_constraintTop_toBottomOf="@id/btnLinks"
+        app:layout_constraintStart_toEndOf="@id/btnSleep"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <Button
+        android:id="@+id/btnBreathing"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:text="Breathing"
+        app:layout_constraintTop_toBottomOf="@id/btnMood"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnStretches" />
+
+    <Button
+        android:id="@+id/btnStretches"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Stretches"
+        app:layout_constraintTop_toBottomOf="@id/btnSleep"
+        app:layout_constraintStart_toEndOf="@id/btnBreathing"
+        app:layout_constraintEnd_toStartOf="@id/btnAffirmations" />
+
+    <Button
+        android:id="@+id/btnAffirmations"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="12dp"
+        android:text="Affirmation"
+        app:layout_constraintTop_toBottomOf="@id/btnHydration"
+        app:layout_constraintStart_toEndOf="@id/btnStretches"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/btnMusic"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:text="Music"
+        app:layout_constraintTop_toBottomOf="@id/btnBreathing"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnDoodle" />
+
+    <Button
+        android:id="@+id/btnDoodle"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Doodle"
+        app:layout_constraintTop_toBottomOf="@id/btnStretches"
+        app:layout_constraintStart_toEndOf="@id/btnMusic"
+        app:layout_constraintEnd_toStartOf="@id/btnPhoto" />
+
+    <Button
+        android:id="@+id/btnPhoto"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="12dp"
+        android:text="Photo"
+        app:layout_constraintTop_toBottomOf="@id/btnAffirmations"
+        app:layout_constraintStart_toEndOf="@id/btnDoodle"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/btnQuote"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:text="Quote"
+        app:layout_constraintTop_toBottomOf="@id/btnMusic"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnJournal" />
+
+    <Button
+        android:id="@+id/btnJournal"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Journal"
+        app:layout_constraintTop_toBottomOf="@id/btnDoodle"
+        app:layout_constraintStart_toEndOf="@id/btnQuote"
+        app:layout_constraintEnd_toStartOf="@id/btnMoreSoon" />
+
+    <Button
+        android:id="@+id/btnMoreSoon"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="12dp"
+        android:text="more soon"
+        app:layout_constraintTop_toBottomOf="@id/btnPhoto"
+        app:layout_constraintStart_toEndOf="@id/btnJournal"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
     <TextView
         android:id="@+id/text_dashboard"
         android:layout_width="match_parent"
@@ -17,6 +168,8 @@
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.758" />
 </androidx.constraintlayout.widget.ConstraintLayout>

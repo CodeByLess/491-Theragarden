@@ -12,14 +12,26 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
+        android:id="@+id/navigation_garden"
+        android:name="com.example.myapplication.ui.garden"
+        android:label="Garden"
+        tools:layout="@layout/fragment_garden" />
+
+    <fragment
         android:id="@+id/navigation_dashboard"
         android:name="com.example.myapplication.ui.dashboard.DashboardFragment"
-        android:label="@string/title_dashboard"
+        android:label="Self-Care Hub"
         tools:layout="@layout/fragment_dashboard" />
+
+    <fragment
+        android:id="@+id/navigation_stats"
+        android:name="com.example.myapplication.ui.Stats"
+        android:label="Stats"
+        tools:layout="@layout/fragment_stats" />
 
     <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.myapplication.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
+        android:label="About Page"
         tools:layout="@layout/fragment_notifications" />
 </navigation>
