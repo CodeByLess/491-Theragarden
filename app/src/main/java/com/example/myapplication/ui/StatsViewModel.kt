@@ -1,13 +1,13 @@
-package com.example.myapplication.ui.notifications
+package com.example.myapplication.ui
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
-class NotificationsViewModel : ViewModel() {
+class StatsViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
-        value = "This is About Page Fragment"
+        value = "This is Stats Fragment"
     }
     val text: LiveData<String> = _text
 }
