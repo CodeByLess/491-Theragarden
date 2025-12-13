@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.InputType
 import android.widget.Button
 import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -18,12 +19,13 @@ class ProfileEditPage : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
 
     private lateinit var btnBack: Button
-    private lateinit var btnChangeEmail: Button
+    private lateinit var btnChangeName: Button
     private lateinit var btnChangePassword: Button
     private lateinit var btnSave: Button
     private lateinit var btnDelete: Button
 
-    private var newEmail: String? = null
+    private var newFirstName: String? = null
+    private var newLastName: String? = null
     private var newPassword: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,14 +36,14 @@ class ProfileEditPage : AppCompatActivity() {
         db = FirebaseFirestore.getInstance()
 
         btnBack = findViewById(R.id.backProfile)
-        btnChangeEmail = findViewById(R.id.ChangeEmail)
+        btnChangeName = findViewById(R.id.Change_name)
         btnChangePassword = findViewById(R.id.ChangePassword)
         btnSave = findViewById(R.id.SaveProfile)
         btnDelete = findViewById(R.id.DeleteAccount)
 
         btnBack.setOnClickListener { finish() }
 
-        btnChangeEmail.setOnClickListener { showChangeEmailDialog() }
+        btnChangeName.setOnClickListener { showChangeNameDialog() }
 
         btnChangePassword.setOnClickListener { showChangePasswordDialog() }
 
@@ -50,31 +52,49 @@ class ProfileEditPage : AppCompatActivity() {
         btnDelete.setOnClickListener { deleteAccount() }
     }
 
-    private fun showChangeEmailDialog() {
-        val input = EditText(this).apply {
-            hint = "New email"
-            setText(firebaseAuth.currentUser?.email ?: "")
-            inputType = InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+    // ---------------- CHANGE NAME ----------------
+    private fun showChangeNameDialog() {
+        val layout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(50, 40, 50, 10)
         }
 
+        val etFirst = EditText(this).apply {
+            hint = "First name"
+            inputType = InputType.TYPE_CLASS_TEXT
+        }
+
+        val etLast = EditText(this).apply {
+            hint = "Last name"
+            inputType = InputType.TYPE_CLASS_TEXT
+        }
+
+        layout.addView(etFirst)
+        layout.addView(etLast)
+
         AlertDialog.Builder(this)
-            .setTitle("Change Email")
-            .setView(input)
+            .setTitle("Change Name")
+            .setView(layout)
             .setPositiveButton("Save") { _, _ ->
-                newEmail = input.text.toString().trim()
-                if (newEmail.isNullOrEmpty()) {
-                    Toast.makeText(this, "Email cannot be empty", Toast.LENGTH_SHORT).show()
+                val first = etFirst.text.toString().trim()
+                val last = etLast.text.toString().trim()
+
+                if (first.isEmpty() || last.isEmpty()) {
+                    Toast.makeText(this, "Both fields are required", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, "Email stored. Press SAVE to apply.", Toast.LENGTH_SHORT).show()
+                    newFirstName = first
+                    newLastName = last
+                    Toast.makeText(this, "Name stored. Press SAVE to apply.", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
+    // ---------------- CHANGE PASSWORD ----------------
     private fun showChangePasswordDialog() {
         val input = EditText(this).apply {
-            hint = "New password (6+ characters)"
+            hint = "New password"
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         }
 
@@ -82,61 +102,59 @@ class ProfileEditPage : AppCompatActivity() {
             .setTitle("Change Password")
             .setView(input)
             .setPositiveButton("Save") { _, _ ->
-                val newPassword = input.text.toString().trim()
-                if (newPassword.length < 6) {
-                    Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-
-                val user = firebaseAuth.currentUser
-                if (user != null) {
-                    user.updatePassword(newPassword)
-                        .addOnSuccessListener {
-                            Toast.makeText(this, "Password updated successfully", Toast.LENGTH_SHORT).show()
-                        }
-                        .addOnFailureListener { e ->
-                            Toast.makeText(
-                                this,
-                                "Error updating password: ${e.message}",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                val value = input.text.toString().trim()
+                if (value.length < 6) {
+                    Toast.makeText(this, "Password must be 6+ characters", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, "No user logged in", Toast.LENGTH_SHORT).show()
+                    newPassword = value
+                    Toast.makeText(this, "Password stored. Press SAVE to apply.", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
+    // ---------------- APPLY CHANGES ----------------
     private fun saveChanges() {
         val user = firebaseAuth.currentUser ?: return
         val uid = user.uid
 
-        // update email if changed
-        if (!newEmail.isNullOrEmpty()) {
-            user.updateEmail(newEmail!!).addOnSuccessListener {
-                db.collection(USER_COLLECTION).document(uid)
-                    .update("email", newEmail)
-                Toast.makeText(this, "Email updated", Toast.LENGTH_SHORT).show()
-            }.addOnFailureListener {
-                Toast.makeText(this, "Error updating email: ${it.message}", Toast.LENGTH_SHORT).show()
-            }
+        // Update name in Firestore
+        val updates = hashMapOf<String, Any>()
+
+        if (!newFirstName.isNullOrEmpty()) {
+            updates["firstName"] = newFirstName!!
+        }
+        if (!newLastName.isNullOrEmpty()) {
+            updates["lastName"] = newLastName!!
         }
 
-        // update password if changed
+        if (updates.isNotEmpty()) {
+            db.collection(USER_COLLECTION).document(uid)
+                .update(updates as Map<String, Any>)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Name updated", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error updating name: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
+        }
+
+        // Update password if changed
         if (!newPassword.isNullOrEmpty()) {
-            user.updatePassword(newPassword!!).addOnSuccessListener {
-                Toast.makeText(this, "Password updated", Toast.LENGTH_SHORT).show()
-            }.addOnFailureListener {
-                Toast.makeText(this, "Error updating password: ${it.message}", Toast.LENGTH_SHORT).show()
-            }
+            user.updatePassword(newPassword!!)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Password updated", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error updating password: ${it.message}", Toast.LENGTH_SHORT).show()
+                }
         }
 
         Toast.makeText(this, "Changes saved", Toast.LENGTH_SHORT).show()
-        finish()
     }
 
+    // ---------------- DELETE ACCOUNT ----------------
     private fun deleteAccount() {
         val user = firebaseAuth.currentUser
         val uid = user?.uid ?: return
@@ -148,10 +166,15 @@ class ProfileEditPage : AppCompatActivity() {
                     if (task.isSuccessful) {
                         Toast.makeText(this, "Account deleted", Toast.LENGTH_LONG).show()
                         val intent = Intent(this, Registration::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                     } else {
-                        Toast.makeText(this, "Error deleting auth: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this,
+                            "Error deleting auth: ${task.exception?.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
             }

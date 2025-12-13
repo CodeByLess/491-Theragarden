@@ -34,5 +34,7 @@
     <string name="change_password">change password</string>
     <string name="change_email">change email</string>
     <string name="back">back</string>
+    <string name="name">Name</string>
+    <string name="change_name">Change Name</string>
 
 </resources>
