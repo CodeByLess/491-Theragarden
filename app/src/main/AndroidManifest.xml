@@ -15,6 +15,57 @@
         android:theme="@style/Theme.Material3.Light"
         tools:targetApi="31">
         <activity
+            android:name=".Tutorial"
+            android:exported="false" />
+        <activity
+            android:name=".Report"
+            android:exported="false" />
+        <activity
+            android:name=".Feedback"
+            android:exported="false" />
+        <activity
+            android:name=".Journal"
+            android:exported="false" />
+        <activity
+            android:name=".Quote"
+            android:exported="false" />
+        <activity
+            android:name=".Photo"
+            android:exported="false" />
+        <activity
+            android:name=".Doodle"
+            android:exported="false" />
+        <activity
+            android:name=".Music"
+            android:exported="false" />
+        <activity
+            android:name=".Affirmations"
+            android:exported="false" />
+        <activity
+            android:name=".Stretches"
+            android:exported="false" />
+        <activity
+            android:name=".Breathing"
+            android:exported="false" />
+        <activity
+            android:name=".Hydration"
+            android:exported="false" />
+        <activity
+            android:name=".Sleep"
+            android:exported="false" />
+        <activity
+            android:name=".Mood"
+            android:exported="false" />
+        <activity
+            android:name=".Links"
+            android:exported="false" />
+        <activity
+            android:name=".Share"
+            android:exported="false" />
+        <activity
+            android:name=".Seeds"
+            android:exported="false" />
+        <activity
             android:name=".ProfileEditPage"
             android:exported="false" />
         <activity
