@@ -97,7 +97,7 @@ class Profile : AppCompatActivity() {
         }
     }
 
-    // --- 5. DELETE FUNCTION (Matches your Registration logic) ---
+    // --- 5. DELETE FUNCTION (Matches fyour Registration logic) ---
     private fun deleteAccount() {
         val user = firebaseAuth.currentUser
         val uid = user?.uid
