@@ -12,6 +12,9 @@ import androidx.core.view.WindowInsetsCompat
 import com.example.myapplication.util.Collection.USER_COLLECTION // This must match your Registration import
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import android.widget.ImageView
+
+
 
 class Profile : AppCompatActivity() {
 
@@ -70,10 +73,9 @@ class Profile : AppCompatActivity() {
     // --- 4. LOAD DATA FUNCTION ---
     private fun loadUserInfo() {
         val user = firebaseAuth.currentUser
-        val uid = user?.uid // We get the UID from the logged-in user
+        val uid = user?.uid
 
         if (uid != null) {
-            // We use that UID to find the document you created in Registration
             db.collection(USER_COLLECTION).document(uid).get()
                 .addOnSuccessListener { document ->
                     if (document != null && document.exists()) {
@@ -86,10 +88,22 @@ class Profile : AppCompatActivity() {
                         tvDob.text = dob
                         tvEmail.text = user.email
                         tvCountry.text = country
+
+                        val avatar = document.getString("avatar") ?: "dog"
+                        val profileImage = findViewById<ImageView>(R.id.profile_image)
+
+                        when (avatar) {
+                            "dog" -> profileImage.setImageResource(R.drawable.dog)
+                            "rabbit" -> profileImage.setImageResource(R.drawable.rabbit)
+                            "cat" -> profileImage.setImageResource(R.drawable.cat)
+                            "butterfly" -> profileImage.setImageResource(R.drawable.butterfly)
+                        }
                     }
                 }
         }
     }
+
+
 
     // --- 5. DELETE FUNCTION (Matches your Registration logic) ---
     private fun deleteAccount() {
