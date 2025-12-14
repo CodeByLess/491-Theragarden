@@ -79,7 +79,7 @@ class ProfileEditPage : AppCompatActivity() {
 
     private fun showChangePasswordDialog() {
         val input = EditText(this).apply {
-            hint = "New password"
+            hint = "New password (6+ characters)"
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         }
 
@@ -87,12 +87,27 @@ class ProfileEditPage : AppCompatActivity() {
             .setTitle("Change Password")
             .setView(input)
             .setPositiveButton("Save") { _, _ ->
-                val value = input.text.toString().trim()
-                if (value.length < 6) {
-                    Toast.makeText(this, "Password must be 6+ characters", Toast.LENGTH_SHORT).show()
+                val newPassword = input.text.toString().trim()
+                if (newPassword.length < 6) {
+                    Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val user = firebaseAuth.currentUser
+                if (user != null) {
+                    user.updatePassword(newPassword)
+                        .addOnSuccessListener {
+                            Toast.makeText(this, "Password updated successfully", Toast.LENGTH_SHORT).show()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(
+                                this,
+                                "Error updating password: ${e.message}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                 } else {
-                    newPassword = value
-                    Toast.makeText(this, "Password stored. Press SAVE to apply.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "No user logged in", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Cancel", null)
@@ -124,6 +139,7 @@ class ProfileEditPage : AppCompatActivity() {
         }
 
         Toast.makeText(this, "Changes saved", Toast.LENGTH_SHORT).show()
+        finish()
     }
 
     private fun deleteAccount() {

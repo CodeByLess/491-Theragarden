@@ -34,5 +34,10 @@
     <string name="change_password">change password</string>
     <string name="change_email">change email</string>
     <string name="back">back</string>
+    <string name="seed_packs">Seed Packs</string>
+    <string name="share">Share</string>
+    <string name="task_name">Task name</string>
+    <string name="add">Add</string>
+    <string name="new_task">New task</string>
 
 </resources>

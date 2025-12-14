@@ -22,6 +22,7 @@ class Profile : AppCompatActivity() {
     private lateinit var db: FirebaseFirestore
 
     private lateinit var tvFullName: TextView
+    private lateinit var tvLastName : TextView
     private lateinit var tvDob: TextView
     private lateinit var tvEmail: TextView
     private lateinit var tvCountry: TextView
@@ -41,7 +42,11 @@ class Profile : AppCompatActivity() {
         val btnDelete = findViewById<Button>(R.id.delete)
 
         // --- 2. SETUP TEXT FIELDS ---
-
+        tvFullName = findViewById(R.id.first)
+        tvLastName = findViewById(R.id.last)
+        tvDob = findViewById(R.id.DOB)
+        tvEmail = findViewById(R.id.email)
+        tvCountry = findViewById(R.id.country)
 
         // Load data on start
         loadUserInfo()
@@ -84,7 +89,8 @@ class Profile : AppCompatActivity() {
                         val dob = document.getString("dateOfBirth")
                         val country = document.getString("country")
 
-                        tvFullName.text = "$first $last"
+                        tvFullName.text = first
+                        tvLastName.text = last
                         tvDob.text = dob
                         tvEmail.text = user.email
                         tvCountry.text = country
