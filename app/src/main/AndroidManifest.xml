@@ -66,7 +66,7 @@
             android:name=".Seeds"
             android:exported="false" />
         <activity
-            android:name=".ProfileEdit"
+            android:name=".ProfileEditPage"
             android:exported="false" />
         <activity
             android:name=".Profile"
