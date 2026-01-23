@@ -8,7 +8,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.Profile
+import com.example.myapplication.TaskAdapter
+import com.example.myapplication.TaskRepository
 import com.example.myapplication.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
@@ -40,9 +43,31 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Profile button stays the same
         binding.btnProfile.setOnClickListener {
             val intent = Intent(requireContext(), Profile::class.java)
             startActivity(intent)
+        }
+
+        val repository = TaskRepository()
+
+        val adapter = TaskAdapter(mutableListOf()) { task ->
+            repository.toggleTask(task)
+        }
+
+        binding.taskRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.taskRecyclerView.adapter = adapter
+
+        repository.listenToTasks { tasks ->
+            adapter.updateTasks(tasks)
+        }
+        binding.btnAdd.setOnClickListener {
+            val taskText = binding.etTask.text.toString().trim()
+
+            if (taskText.isNotEmpty()) {
+                repository.addTask(taskText)
+                binding.etTask.text.clear()
+            }
         }
     }
 

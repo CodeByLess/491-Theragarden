@@ -23,6 +23,7 @@ class ProfileEditPage : AppCompatActivity() {
     private lateinit var btnChangePassword: Button
     private lateinit var btnSave: Button
     private lateinit var btnDelete: Button
+    private lateinit var btnEditAvatar: Button
 
     private var newFirstName: String? = null
     private var newLastName: String? = null
@@ -40,6 +41,8 @@ class ProfileEditPage : AppCompatActivity() {
         btnChangePassword = findViewById(R.id.ChangePassword)
         btnSave = findViewById(R.id.SaveProfile)
         btnDelete = findViewById(R.id.DeleteAccount)
+        btnEditAvatar = findViewById(R.id.EditAvatar)
+
 
         btnBack.setOnClickListener { finish() }
 
@@ -50,6 +53,8 @@ class ProfileEditPage : AppCompatActivity() {
         btnSave.setOnClickListener { saveChanges() }
 
         btnDelete.setOnClickListener { deleteAccount() }
+
+        btnEditAvatar.setOnClickListener { showAvatarDialog() }
     }
 
     // ---------------- CHANGE NAME ----------------
@@ -182,4 +187,35 @@ class ProfileEditPage : AppCompatActivity() {
                 Toast.makeText(this, "Error deleting Firestore: ${it.message}", Toast.LENGTH_SHORT).show()
             }
     }
+    private fun showAvatarDialog() {
+        // The labels the user sees
+        val avatars = arrayOf("Dog", "Rabbit", "Cat", "Butterfly")
+
+        AlertDialog.Builder(this)
+            .setTitle("Choose Your Avatar")
+            .setItems(avatars) { _, which ->
+                val selectedKey = when (which) {
+                    0 -> "dog"
+                    1 -> "rabbit"
+                    2 -> "cat"
+                    else -> "butterfly"
+                }
+                saveAvatarSelection(selectedKey)
+            }
+            .show()
+    }
+    private fun saveAvatarSelection(avatarKey: String) {
+        val uid = firebaseAuth.currentUser?.uid ?: return
+
+        db.collection(USER_COLLECTION).document(uid)
+            .update("avatar", avatarKey)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Avatar updated!", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to update avatar: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
 }
+
+
