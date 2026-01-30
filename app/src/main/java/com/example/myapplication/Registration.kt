@@ -39,7 +39,7 @@ class Registration : AppCompatActivity() {
             val lastName = binding.last.text.toString()
             val dateOfBirth = binding.DOB.text.toString()
             val country = binding.Country.text.toString()
-            val profileImageUrl = "dog.png"
+            val avatar = "dog"
 
 
             if (email.isNotEmpty() && pass.isNotEmpty()) {
@@ -48,7 +48,7 @@ class Registration : AppCompatActivity() {
                         if (task.isSuccessful) {
                             val uid = task.result?.user?.uid ?: return@addOnCompleteListener
                             val user =
-                                User(firstName, lastName, dateOfBirth, country, profileImageUrl)
+                                User(firstName, lastName, dateOfBirth, country, avatar, email)
                             saveUserInfo(uid, user)
                             val intent = Intent(this, Login::class.java)
                             startActivity(intent)
