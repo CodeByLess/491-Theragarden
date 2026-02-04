@@ -57,7 +57,7 @@ class ProfileEditPage : AppCompatActivity() {
         btnEditAvatar.setOnClickListener { showAvatarDialog() }
     }
 
-    // ---------------- CHANGE NAME ----------------
+
     private fun showChangeNameDialog() {
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
@@ -96,7 +96,6 @@ class ProfileEditPage : AppCompatActivity() {
             .show()
     }
 
-    // ---------------- CHANGE PASSWORD ----------------
     private fun showChangePasswordDialog() {
         val input = EditText(this).apply {
             hint = "New password"
@@ -119,12 +118,12 @@ class ProfileEditPage : AppCompatActivity() {
             .show()
     }
 
-    // ---------------- APPLY CHANGES ----------------
+
     private fun saveChanges() {
         val user = firebaseAuth.currentUser ?: return
         val uid = user.uid
 
-        // Update name in Firestore
+
         val updates = hashMapOf<String, Any>()
 
         if (!newFirstName.isNullOrEmpty()) {
@@ -145,7 +144,7 @@ class ProfileEditPage : AppCompatActivity() {
                 }
         }
 
-        // Update password if changed
+
         if (!newPassword.isNullOrEmpty()) {
             user.updatePassword(newPassword!!)
                 .addOnSuccessListener {
@@ -158,8 +157,6 @@ class ProfileEditPage : AppCompatActivity() {
 
         Toast.makeText(this, "Changes saved", Toast.LENGTH_SHORT).show()
     }
-
-    // ---------------- DELETE ACCOUNT ----------------
     private fun deleteAccount() {
         val user = firebaseAuth.currentUser
         val uid = user?.uid ?: return
