@@ -13,10 +13,14 @@ import com.example.myapplication.Profile
 import com.example.myapplication.TaskAdapter
 import com.example.myapplication.TaskRepository
 import com.example.myapplication.databinding.FragmentHomeBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 
 class HomeFragment : Fragment() {
 
     private var _binding: FragmentHomeBinding? = null
+    private var goalsListener: ListenerRegistration? = null
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -43,6 +47,22 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // completed Goals
+        val uid = FirebaseAuth.getInstance().currentUser?.uid
+        if (uid == null) {
+            binding.txtCompletedGoals.text = "Goals completed: 0"
+        } else {
+            val userRef = FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+
+            goalsListener = userRef.addSnapshotListener { snapshot, _ ->
+                if (_binding == null) return@addSnapshotListener
+
+                val count = snapshot?.getLong("completedGoals") ?: 0L
+                binding.txtCompletedGoals.text = "Goals completed: $count"
+            }
+        }
         // Profile button stays the same
         binding.btnProfile.setOnClickListener {
             val intent = Intent(requireContext(), Profile::class.java)
@@ -73,6 +93,8 @@ class HomeFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        goalsListener?.remove()
+        goalsListener = null
         _binding = null
     }
 }

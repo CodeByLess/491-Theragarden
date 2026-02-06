@@ -9,6 +9,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class Stretch3 : AppCompatActivity() {
+    private val goalsRepository = GoalsRepository()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -26,12 +28,16 @@ class Stretch3 : AppCompatActivity() {
         }
         val submitButton = findViewById<Button>(R.id.btnSubmit)
         submitButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-                putExtra("OPEN_TAB", "DASHBOARD")
+            goalsRepository.incrementGoals { success ->
+                if (success) {
+                    val intent = Intent(this, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        putExtra("OPEN_TAB", "DASHBOARD")
+                    }
+                    startActivity(intent)
+                    finish()
+                }
             }
-            startActivity(intent)
-            finish()
         }
 
 
