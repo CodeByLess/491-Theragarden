@@ -8,19 +8,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
-class Stretches : AppCompatActivity() {
+class Stretch3 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_stretches)
+        setContentView(R.layout.activity_stretch3)
 
         val backButton = findViewById<Button>(R.id.btnBack)
         backButton.setOnClickListener {
             finish() // return to Home
         }
+
         val nextButton = findViewById<Button>(R.id.btnNext)
         nextButton.setOnClickListener {
-            val intent = Intent(this, Stretch2::class.java)
+            val intent = Intent(this, Stretch4::class.java)
             startActivity(intent)
         }
         val submitButton = findViewById<Button>(R.id.btnSubmit)
@@ -32,6 +33,8 @@ class Stretches : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+
+
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

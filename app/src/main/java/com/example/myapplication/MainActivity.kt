@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
@@ -20,10 +21,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         val navView: BottomNavigationView = binding.navView
-
         val navController = findNavController(R.id.nav_host_fragment_activity_main)
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+
+
         val appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.navigation_home, R.id.navigation_garden, R.id.navigation_dashboard,R.id.navigation_stats, R.id.navigation_notifications
@@ -31,5 +31,19 @@ class MainActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        handleOpenTab(intent, navView)
     }
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleOpenTab(intent, binding.navView)
+    }
+
+    private fun handleOpenTab(intent: Intent?, navView: BottomNavigationView) {
+        when (intent?.getStringExtra("OPEN_TAB")) {
+            "DASHBOARD" -> navView.selectedItemId = R.id.navigation_dashboard
+        }
+    }
+
 }
