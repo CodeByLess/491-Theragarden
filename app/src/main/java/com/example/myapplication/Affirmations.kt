@@ -1,11 +1,10 @@
 package com.example.myapplication
 
-import android.os.Build
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -17,7 +16,6 @@ class Affirmations : AppCompatActivity() {
     private val KEY_TEXT = "daily_text"
     private val KEY_DATE = "daily_date"
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -27,15 +25,13 @@ class Affirmations : AppCompatActivity() {
         val saveButton = findViewById<Button>(R.id.btnSave)
         val editText = findViewById<EditText>(R.id.etAffirmation)
 
-        backButton.setOnClickListener {
-            finish()
-        }
+        backButton.setOnClickListener { finish() }
 
         val prefs = getSharedPreferences(PREFS, MODE_PRIVATE)
         val today = LocalDate.now().toString()
         val savedDate = prefs.getString(KEY_DATE, "")
 
-        // Reset if it's a new day
+        // Load if same day, otherwise reset
         if (savedDate == today) {
             editText.setText(prefs.getString(KEY_TEXT, ""))
         } else {
@@ -47,6 +43,8 @@ class Affirmations : AppCompatActivity() {
                 .putString(KEY_TEXT, editText.text.toString())
                 .putString(KEY_DATE, today)
                 .apply()
+
+            Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show()
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->

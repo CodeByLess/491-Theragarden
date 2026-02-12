@@ -37,23 +37,21 @@ class Quote : AppCompatActivity() {
             quoteText.text = "Loading affirmation..."
 
             val request = Request.Builder()
-                .url("https://affirmations.dev/")
+                .url("https://www.affirmations.dev/")
                 .build()
 
             client.newCall(request).enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     runOnUiThread {
                         quoteText.text = "Couldn’t load a quote. Try again."
-                        Toast.makeText(this@Quote, "Network error", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@Quote, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
 
                 override fun onResponse(call: Call, response: Response) {
                     response.use {
                         if (!it.isSuccessful) {
-                            runOnUiThread {
-                                quoteText.text = "Couldn’t load a quote. Try again."
-                            }
+                            runOnUiThread { quoteText.text = "Couldn’t load a quote. Try again." }
                             return
                         }
 
@@ -74,8 +72,6 @@ class Quote : AppCompatActivity() {
         }
 
         newQuoteButton.setOnClickListener { fetchAffirmation() }
-
-        // Load one immediately
         fetchAffirmation()
     }
 }
