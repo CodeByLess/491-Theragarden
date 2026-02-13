@@ -63,10 +63,10 @@ dependencies {
     implementation(libs.androidx.annotation)
     implementation(libs.firebase.storage)
 
-    // ✅ OkHttp (quote API)
+
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
-    // ✅ Required for java.time on minSdk < 26
+
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
     testImplementation(libs.junit)
