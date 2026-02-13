@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">My Application</string>
+
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
@@ -8,16 +9,22 @@
     <string name="already_registered_sign_in">Already Registered , Sign In !</string>
     <string name="not_registered_yet_sign_up">Not Registered Yet , Sign Up !</string>
     <string name="sign_in">Sign In</string>
+
     <string name="title_activity_profile">Profile</string>
+
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>
+
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome !"</string>
+
+    <string name="welcome">Welcome!</string>
     <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
-    <string name="login_failed">"Login failed"</string>
-    <string name="profile_picture">profile picture</string>
+    <string name="invalid_password">Password must be &gt;5 characters</string>
+    <string name="login_failed">Login failed</string>
+
+    <string name="profile_picture">Profile picture</string>
+
     <string name="sign_up">Sign Up</string>
     <string name="first_name">First Name</string>
     <string name="last_name">Last Name</string>
@@ -26,18 +33,36 @@
     <string name="country">Country</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
+
     <string name="profile">Profile</string>
-    <string name="edit_profile">edit profile</string>
-    <string name="delete_profile">delete profile</string>
-    <string name="delete">delete account</string>
-    <string name="save">save</string>
-    <string name="change_password">change password</string>
-    <string name="change_email">change email</string>
-    <string name="back">back</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="delete_profile">Delete profile</string>
+    <string name="delete">Delete account</string>
+    <string name="save">Save</string>
+
+    <string name="change_password">Change password</string>
+    <string name="change_email">Change email</string>
+    <string name="back">Back</string>
+
     <string name="seed_packs">Seed Packs</string>
     <string name="share">Share</string>
+
     <string name="task_name">Task name</string>
     <string name="add">Add</string>
     <string name="new_task">New task</string>
 
+    <string name="mood">Mood</string>
+    <string name="submit">Submit</string>
+
+    <string name="madbutton">madButton</string>
+    <string name="okaybutton">okayButton</string>
+    <string name="happy">Happy</string>
+    <string name="log_mood_for">Log mood for:</string>
+
+    <string name="name">Name</string>
+    <string name="change_name">Change Name</string>
+    <string name="music">Music</string>
+    <string name="press_submit_if_you_are_done_to_update_plant_progress">Press submit if you are done to update plant progress</string>
+    <string name="rain">Rain</string>
+    <string name="play">Play</string>
 </resources>
