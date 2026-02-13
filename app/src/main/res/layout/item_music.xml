@@ -7,7 +7,7 @@
     android:padding="12dp"
     android:layout_marginBottom="12dp"
     android:gravity="center_vertical">
-
+    <!-- This is the textview that holds the music element -->
     <TextView
         android:id="@+id/tvMusicName"
         android:layout_width="0dp"
@@ -18,7 +18,7 @@
         android:textColor="@color/white"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"/>
-
+    <!-- This is the progress bar that will hold the music progress -->
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
