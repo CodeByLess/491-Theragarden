@@ -28,7 +28,6 @@ android {
         }
     }
 
-    // ✅ Fix: Use Java 17 + Desugaring (LocalDate works on minSdk 24)
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
