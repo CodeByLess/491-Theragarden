@@ -7,6 +7,8 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!--Added by Lesley Del Cid: background color for stretches text box-->
     <color name="gray_green">#455c34</color>
+    <!--Added by Lesley Del Cid: Main background color for stretch screens-->
     <color name="dark_gray_brown">#2b1b10</color>
 </resources>
