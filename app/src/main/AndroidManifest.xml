@@ -36,6 +36,9 @@
             android:name=".Journal"
             android:exported="false" />
         <activity
+            android:name=".Sleep"
+            android:exported="false" />
+        <activity
             android:name=".Quote"
             android:exported="false" />
         <activity
