@@ -24,6 +24,9 @@
             android:name=".Journal"
             android:exported="false" />
         <activity
+            android:name=".Sleep"
+            android:exported="false" />
+        <activity
             android:name=".Registration"
             android:exported="false"
             android:theme="@style/Theme.Material3.Light.NoActionBar" />
