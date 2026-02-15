@@ -1,4 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    activity_breathing.xml
+    Layout file for the Breathing Activity.
+
+    This layout uses a ConstraintLayout as the root container.
+    It contains:
+    - A back button
+    - A styled MaterialCardView container
+    - TextViews for title, prompts, phase, and round tracking
+    - A Lottie animation for visual breathing guidance
+    - A start/pause/resume button at the bottom
+-->
+
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,6 +23,7 @@
     android:background="#2B1A12"
     tools:context=".Breathing">
 
+    <!-- Back button to exit the breathing activity -->
     <Button
         android:id="@+id/btnBack"
         android:layout_width="wrap_content"
@@ -18,7 +33,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- GREEN CARD -->
+    <!--
+        Main content card.
+        This green MaterialCardView visually separates the breathing
+        content from the dark background.
+    -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardContainer"
         android:layout_width="0dp"
@@ -33,11 +52,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Inner layout for organizing card contents -->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="24dp">
 
+            <!-- Title text displayed at top of card -->
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
@@ -50,6 +71,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
+            <!-- Instructional prompt text shown below title -->
             <TextView
                 android:id="@+id/tvPrompt"
                 android:layout_width="0dp"
@@ -62,6 +84,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
+            <!-- Displays current breathing phase (INHALE / HOLD / EXHALE) -->
             <TextView
                 android:id="@+id/tvPhase"
                 android:layout_width="wrap_content"
@@ -75,6 +98,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
+            <!-- Displays current round progress (e.g., Round 1 / 5) -->
             <TextView
                 android:id="@+id/tvRound"
                 android:layout_width="wrap_content"
@@ -86,7 +110,11 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
-            <!-- GRAY SQUARE BEHIND SLOTH -->
+            <!--
+                Lottie animation view.
+                Displays animated sloth during breathing.
+                Background gray square helps visually frame animation.
+            -->
             <com.airbnb.lottie.LottieAnimationView
                 android:id="@+id/imgBreath"
                 android:layout_width="180dp"
@@ -104,6 +132,10 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!--
+        Start / Pause / Resume button.
+        Behavior changes dynamically based on session state.
+    -->
     <Button
         android:id="@+id/btnStartStop"
         android:layout_width="0dp"

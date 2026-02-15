@@ -2,7 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Added by Paula Awad: INTERNET PERMISSION
+         Required for Firebase communication and remote data access. -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Added by Paula Awad: CAMERA PERMISSION
+         Allows the app to access the device camera for capturing gratitude photos.
+         Permission is requested at runtime inside Photo.kt. -->
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -15,20 +22,37 @@
         android:theme="@style/Theme.Material3.Light"
         tools:targetApi="31">
 
-        <!-- ✅ YOUR EXISTING ACTIVITIES -->
-        <activity
-            android:name=".ProfileEditPage"
-            android:exported="false" />
-        <activity
-            android:name=".Profile"
-            android:exported="false" />
+        <!-- Added by Paula Awad: FILE PROVIDER CONFIGURATION
+             Enables secure file sharing between the app and the camera.
+             Required for saving full-resolution images using FileProvider.
+             References gallery.xml for controlled access to app-specific files. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/gallery" />
+        </provider>
+
+        <!-- Added by Paula Awad: GRATITUDE PHOTO FEATURE ACTIVITIES
+             Photo activity handles capturing images.
+             GalleryActivity displays saved gratitude images in a RecyclerView grid. -->
+        <activity android:name=".GalleryActivity" android:exported="false" />
+        <activity android:name=".Photo" android:exported="false" />
+
+        <activity android:name=".ProfileEditPage" android:exported="false" />
+        <activity android:name=".Profile" android:exported="false" />
         <activity
             android:name=".Registration"
             android:exported="false"
             android:theme="@style/Theme.Material3.Light.NoActionBar" />
 
-        <!-- ✅ ADDED: Self-Care Hub Activities (so buttons don’t kick you back to Login) -->
+        <!-- Added by Paula Awad: BREATHING ACTIVITY
+             Registers the guided breathing feature activity. -->
         <activity android:name=".Breathing" android:exported="false" />
+
         <activity android:name=".Links" android:exported="false" />
         <activity android:name=".Mood" android:exported="false" />
         <activity android:name=".Sleep" android:exported="false" />
@@ -37,11 +61,9 @@
         <activity android:name=".Affirmations" android:exported="false" />
         <activity android:name=".Music" android:exported="false" />
         <activity android:name=".Doodle" android:exported="false" />
-        <activity android:name=".Photo" android:exported="false" />
         <activity android:name=".Quote" android:exported="false" />
         <activity android:name=".Journal" android:exported="false" />
 
-        <!-- ✅ YOUR EXISTING MAIN + LOGIN -->
         <activity
             android:name=".Login"
             android:exported="true"
@@ -52,9 +74,7 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".MainActivity"
-            android:exported="true" />
+        <activity android:name=".MainActivity" android:exported="true" />
 
     </application>
 
