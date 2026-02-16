@@ -5,6 +5,8 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+    <color name="dark_gray_brown">#2b1b10</color>
+    <color name="gray_green">#455c34</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <!--Added by Lesley Del Cid: background color for stretches text box-->
