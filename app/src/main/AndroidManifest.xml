@@ -2,8 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Added by Paula Awad: INTERNET PERMISSION
-         Required for Firebase communication and remote data access. -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- Added by Paula Awad: CAMERA PERMISSION
@@ -36,33 +34,91 @@
                 android:resource="@xml/gallery" />
         </provider>
 
+        <activity
+            android:name=".Stretch4"
+            android:exported="false" />
+        <activity
+            android:name=".Stretch3"
+            android:exported="false" />
+        <activity
+            android:name=".Stretch2"
+            android:exported="false" />
+        <activity
+            android:name=".Tutorial"
+            android:exported="false" />
+        <activity
+            android:name=".Report"
+            android:exported="false" />
+        <activity
+            android:name=".Feedback"
+            android:exported="false" />
+
         <!-- Added by Paula Awad: GRATITUDE PHOTO FEATURE ACTIVITIES
              Photo activity handles capturing images.
              GalleryActivity displays saved gratitude images in a RecyclerView grid. -->
-        <activity android:name=".GalleryActivity" android:exported="false" />
-        <activity android:name=".Photo" android:exported="false" />
+        <activity
+            android:name=".Journal"
+            android:exported="false" />
+        <activity
+            android:name=".Sleep"
+            android:exported="false" />
+        <activity
+            android:name=".Quote"
+            android:exported="false" />
+        <activity
+            android:name=".Photo"
+            android:exported="false" />
+        <activity
+            android:name=".GalleryActivity"
+            android:exported="false" />
 
-        <activity android:name=".ProfileEditPage" android:exported="false" />
-        <activity android:name=".Profile" android:exported="false" />
+        <activity
+            android:name=".Doodle"
+            android:exported="false" />
+        <activity
+            android:name=".Music"
+            android:exported="false" />
+        <activity
+            android:name=".Affirmations"
+            android:exported="false" />
+        <activity
+            android:name=".Stretches"
+            android:exported="false" />
+
+        <!-- Added by Paula Awad: BREATHING ACTIVITY
+             Registers the guided breathing feature activity. -->
+        <activity
+            android:name=".Breathing"
+            android:exported="false" />
+
+        <activity
+            android:name=".Hydration"
+            android:exported="false" />
+        <activity
+            android:name=".Sleep"
+            android:exported="false" />
+        <activity
+            android:name=".Mood"
+            android:exported="false" />
+        <activity
+            android:name=".Links"
+            android:exported="false" />
+        <activity
+            android:name=".Share"
+            android:exported="false" />
+        <activity
+            android:name=".Seeds"
+            android:exported="false" />
+        <activity
+            android:name=".ProfileEditPage"
+            android:exported="false" />
+        <activity
+            android:name=".Profile"
+            android:exported="false" />
         <activity
             android:name=".Registration"
             android:exported="false"
             android:theme="@style/Theme.Material3.Light.NoActionBar" />
-
-        <!-- Added by Paula Awad: BREATHING ACTIVITY
-             Registers the guided breathing feature activity. -->
-        <activity android:name=".Breathing" android:exported="false" />
-
-        <activity android:name=".Links" android:exported="false" />
-        <activity android:name=".Mood" android:exported="false" />
-        <activity android:name=".Sleep" android:exported="false" />
-        <activity android:name=".Hydration" android:exported="false" />
-        <activity android:name=".Stretches" android:exported="false" />
-        <activity android:name=".Affirmations" android:exported="false" />
-        <activity android:name=".Music" android:exported="false" />
-        <activity android:name=".Doodle" android:exported="false" />
-        <activity android:name=".Quote" android:exported="false" />
-        <activity android:name=".Journal" android:exported="false" />
 
         <activity
             android:name=".Login"
@@ -74,7 +130,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".MainActivity" android:exported="true" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="true" />
 
     </application>
 
