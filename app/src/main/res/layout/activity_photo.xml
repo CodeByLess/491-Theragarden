@@ -1,19 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<!--
+    activity_photo.xml
+
+    Layout for the Photo Activity in Theragarden.
+    This screen allows users to:
+    - Navigate back
+    - Capture a gratitude photo
+    - View a preview of the captured image
+    - Open the gallery screen
+
+    The design uses ConstraintLayout as the root container
+    and CardView to visually group the main content.
+-->
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Photo">
+    android:background="#4B2E1E">
 
+    <!-- Back button to return to previous screen -->
     <Button
         android:id="@+id/btnBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="back"
-        android:layout_margin="16dp"
+        android:text="Back"
+        android:backgroundTint="#6C63FF"
+        android:textColor="@android:color/white"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!--
+        Card container for main content.
+        Provides rounded corners, elevation (shadow),
+        and a themed background color.
+    -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/photoCard"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="24dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="8dp"
+        app:cardBackgroundColor="#5C7A3A"
+        app:layout_constraintTop_toBottomOf="@id/btnBack"
+        app:layout_constraintBottom_toTopOf="@id/btnGallery"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Vertical layout to stack title, message, and image preview -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center_horizontal">
+
+            <!-- Screen title -->
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gratitude Photo"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"/>
+
+            <!-- Instructional message encouraging user reflection -->
+            <TextView
+                android:id="@+id/tvMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Take a photo of something you like or feel grateful for today."
+                android:textSize="15sp"
+                android:textColor="#E6F2D9"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"/>
+
+            <!--
+                Image preview area.
+                Displays the captured photo.
+                Background color acts as placeholder before image is set.
+            -->
+            <ImageView
+                android:id="@+id/imagePreview"
+                android:layout_width="260dp"
+                android:layout_height="260dp"
+                android:background="#6E8F4F"
+                android:scaleType="centerCrop" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Button to open custom gallery activity -->
+    <Button
+        android:id="@+id/btnGallery"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:text="Open Gallery"
+        android:backgroundTint="#3E6B48"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="92dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Button to launch camera and capture new photo -->
+    <Button
+        android:id="@+id/btnCapture"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:text="Take Photo"
+        android:backgroundTint="#6C63FF"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
