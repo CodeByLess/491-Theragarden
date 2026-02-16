@@ -96,7 +96,7 @@ class Profile : AppCompatActivity() {
                         tvCountry.text = country
 
                         val avatar = document.getString("avatar") ?: "dog"
-                        val profileImage = findViewById<ImageView>(R.id.profile_image)
+                        val profileImage = findViewById<ImageView>(R.id.avatar)
 
                         when (avatar) {
                             "dog" -> profileImage.setImageResource(R.drawable.dog)

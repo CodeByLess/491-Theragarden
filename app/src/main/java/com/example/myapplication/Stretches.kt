@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import androidx.activity.enableEdgeToEdge
@@ -16,6 +17,20 @@ class Stretches : AppCompatActivity() {
         val backButton = findViewById<Button>(R.id.btnBack)
         backButton.setOnClickListener {
             finish() // return to Home
+        }
+        val nextButton = findViewById<Button>(R.id.btnNext)
+        nextButton.setOnClickListener {
+            val intent = Intent(this, Stretch2::class.java)
+            startActivity(intent)
+        }
+        val submitButton = findViewById<Button>(R.id.btnSubmit)
+        submitButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                putExtra("OPEN_TAB", "DASHBOARD")
+            }
+            startActivity(intent)
+            finish()
         }
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
