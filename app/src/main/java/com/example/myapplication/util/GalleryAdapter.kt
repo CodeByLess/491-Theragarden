@@ -18,8 +18,11 @@ import java.io.File
  * image files inside the GalleryActivity.
  * Each image is displayed using item_image layout.
  */
-class GalleryAdapter(private val images: List<File>) :
-    RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
+class GalleryAdapter(
+    private var images: List<File>,
+    private val onDeleteRequested: (File) -> Unit,
+    private val onImageSelected: (File) -> Unit
+) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
 
     /*
      * ViewHolder class holds reference to ImageView
@@ -47,6 +50,22 @@ class GalleryAdapter(private val images: List<File>) :
      * Converts File into URI for display.
      */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.imageView.setImageURI(Uri.fromFile(images[position]))
+        val file = images[position]
+
+        holder.imageView.setImageURI(Uri.fromFile(file))
+
+        holder.itemView.setOnClickListener {
+            onImageSelected(file)
+        }
+
+        holder.itemView.setOnLongClickListener {
+            onDeleteRequested(file)
+            true
+        }
+    }
+
+    fun updateFiles(newImages: List<File>) {
+        images = newImages
+        notifyDataSetChanged()
     }
 }

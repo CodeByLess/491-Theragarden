@@ -1,9 +1,12 @@
 package com.example.myapplication
 
 // Android and UI-related imports
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,56 +26,58 @@ import java.io.File
  */
 class GalleryActivity : AppCompatActivity() {
 
+    companion object {
+        const val EXTRA_SELECTED_IMAGE_PATH = "selectedImagePath"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gallery)
 
-        // Initialize UI components
         val btnBack = findViewById<Button>(R.id.btnBackGallery)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
 
-        // Back button closes the gallery activity
-        btnBack.setOnClickListener {
-            finish()
-        }
+        btnBack.setOnClickListener { finish() }
 
-        /*
-         * Set RecyclerView layout manager.
-         * GridLayoutManager displays images in a grid format.
-         * The value "3" represents three columns per row.
-         */
         recyclerView.layoutManager = GridLayoutManager(this, 3)
 
-        // Set adapter with list of image files
-        recyclerView.adapter = GalleryAdapter(loadImages())
+        lateinit var adapter: GalleryAdapter
+
+        adapter = GalleryAdapter(
+            loadImages(),
+            onDeleteRequested = { fileToDelete ->
+
+                val deleted = try {
+                    fileToDelete.delete()
+                } catch (e: Exception) {
+                    false
+                }
+
+                if (deleted) {
+                    Toast.makeText(this, "Deleted", Toast.LENGTH_SHORT).show()
+                    adapter.updateFiles(loadImages())
+                } else {
+                    Toast.makeText(this, "Could not delete", Toast.LENGTH_SHORT).show()
+                }
+            },
+            onImageSelected = { selectedFile ->
+                val resultIntent = Intent()
+                resultIntent.putExtra(EXTRA_SELECTED_IMAGE_PATH, selectedFile.absolutePath)
+                setResult(Activity.RESULT_OK, resultIntent)
+                finish()
+            }
+        )
+
+        recyclerView.adapter = adapter
     }
 
-    /*
-     * Loads image files from the TheragardenGallery folder.
-     *
-     * Steps:
-     * 1. Access app-specific external pictures directory
-     * 2. Locate the custom gallery folder
-     * 3. Return only valid image files
-     * 4. Sort images by most recent first
-     */
     private fun loadImages(): List<File> {
 
-        // Get app-specific external pictures directory
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-
-        // Access TheragardenGallery subfolder
         val galleryFolder = File(storageDir, "TheragardenGallery")
 
-        // If folder does not exist, return empty list
         if (!galleryFolder.exists()) return emptyList()
 
-        /*
-         * Retrieve list of files:
-         * - Filter to include only files (not directories)
-         * - Sort by last modified date in descending order
-         * - If null, return empty list
-         */
         return galleryFolder.listFiles()
             ?.filter { it.isFile }
             ?.sortedByDescending { it.lastModified() }

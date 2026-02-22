@@ -38,6 +38,7 @@ class Photo : AppCompatActivity() {
     // Request codes for camera intent and permission handling
     private val CAMERA_REQUEST = 100
     private val CAMERA_PERMISSION = 101
+    private val GALLERY_REQUEST = 102
 
     // File reference for the captured image
     private var photoFile: File? = null
@@ -58,9 +59,10 @@ class Photo : AppCompatActivity() {
         // Back button closes the activity
         btnBack.setOnClickListener { finish() }
 
-        // Opens gallery activity to view saved images
+        // Opens gallery activity to select a saved image
         btnGallery.setOnClickListener {
-            startActivity(Intent(this, GalleryActivity::class.java))
+            val intent = Intent(this, GalleryActivity::class.java)
+            startActivityForResult(intent, GALLERY_REQUEST)
         }
 
         // Capture button checks camera permission before opening camera
@@ -157,8 +159,20 @@ class Photo : AppCompatActivity() {
                 Toast.makeText(this, "Save failed. Try again.", Toast.LENGTH_SHORT).show()
             }
 
+        } else if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK) {
+
+            val selectedPath = data?.getStringExtra(GalleryActivity.EXTRA_SELECTED_IMAGE_PATH)
+            if (!selectedPath.isNullOrBlank()) {
+                val selectedFile = File(selectedPath)
+                if (selectedFile.exists()) {
+                    imagePreview.setImageURI(Uri.fromFile(selectedFile))
+                } else {
+                    Toast.makeText(this, "Selected image not found.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
         } else {
-            Toast.makeText(this, "Photo canceled.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Canceled.", Toast.LENGTH_SHORT).show()
         }
     }
 
