@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.app.AlertDialog
 import com.example.myapplication.Profile
 import com.example.myapplication.TaskAdapter
 import com.example.myapplication.TaskRepository
@@ -16,6 +17,7 @@ import com.example.myapplication.databinding.FragmentHomeBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
+import com.example.myapplication.R
 
 /*
   HomeFragment
@@ -58,11 +60,13 @@ class HomeFragment : Fragment() {
         homeViewModel.text.observe(viewLifecycleOwner) {
             textView.text = it
         }
+
         return root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         // Profile button stays the same
         binding.btnProfile.setOnClickListener {
             val intent = Intent(requireContext(), Profile::class.java)
@@ -71,95 +75,97 @@ class HomeFragment : Fragment() {
 
         /*Added by Lesley Del Cid:
           GOAL + PLANT INITIALIZATION
-          - Retrieves the current logged-in user's UID.
-          - If no user exists, display safe default values.
         */
         val uid = FirebaseAuth.getInstance().currentUser?.uid
 
         if (uid == null) {
-            //Added by Lesley Del Cid:
-            // GOALS: Default display when no authenticated user is found
             binding.txtCompletedGoals.text = "Goals completed: 0"
         } else {
 
-            //Added by Lesley Del Cid:
-            // Reference to the user's Firestore document
             val userRef = FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(uid)
 
-            /*Added by Lesley Del Cid:
-              REAL-TIME LISTENER
-              - Updates UI automatically whenever:
-                  • completedGoals changes (from stretches or other features)
-                  • PlantData changes (new seed, progress updates, completion)
-            */
             goalsListener = userRef.addSnapshotListener { snapshot, _ ->
                 if (_binding == null) return@addSnapshotListener
 
-                /*Added by Lesley Del Cid:
-                  GOALS: Display total completed goals.
-                  - Updated when stretches call GoalsRepository.incrementGoals().
-                */
+                // GOALS
                 val count = snapshot?.getLong("completedGoals") ?: 0L
                 binding.txtCompletedGoals.text = "Goals completed: $count"
 
-                /*Added by Lesley Del Cid:
-                  PLANT DATA:
-                  - Read plant state fields from the SAME user document.
-                */
+                // PLANT DATA
                 val currentSeedId = snapshot?.getString("currentSeedId") ?: ""
                 val plantProgress = snapshot?.getLong("plantProgress")?.toInt() ?: 0
                 val plantCompleted = snapshot?.getBoolean("plantCompleted") ?: false
+                val plantStage = snapshot?.getString("plantStage") ?: "dirt"
 
-                /*Added by Lesley Del Cid:
-                  CURRENT PLANT DISPLAY:
-                  - Shows selected seed.
-                  - If none selected, displays "None".
-                */
+                // CURRENT PLANT DISPLAY
                 binding.txtCurrentPlant.text =
                     if (currentSeedId.isBlank())
                         "Current plant: None"
                     else
                         "Current plant: $currentSeedId"
 
+                // STAGE DISPLAY
+                binding.txtPlantStage.text = "Stage: $plantStage"
+
                 /*Added by Lesley Del Cid:
-                  PLANT PROGRESS BAR:
-                  - Progress value is stored in Firestore (0–100).
-                  - Updated in real-time as plantProgress changes.
+                  PLANT IMAGE DISPLAY
                 */
+                val imageRes = when (plantStage.lowercase()) {
+                    "dirt" -> R.drawable.dirt
+                    "sprout" -> R.drawable.sprout
+                    "bloom" -> {
+                        when (currentSeedId) {
+                            "Sunflower Seed" -> R.drawable.sunflower
+                            "Strawberry Seed" -> R.drawable.strawberry
+                            "Lavender Seed" -> R.drawable.lavender
+                            else -> R.drawable.sprout
+                        }
+                    }
+                    else -> R.drawable.dirt
+                }
+
+                binding.imgPlantStage.setImageResource(imageRes)
+
+                // PROGRESS BAR
                 binding.plantProgressBar.progress = plantProgress
 
                 /*Added by Lesley Del Cid:
-                  PLANT COMPLETION:
-                  - When plantCompleted == true,
-                    user can start a new plant cycle.
-                  - Button remains hidden while plant is still growing.
+                  SEED BUTTON VISIBILITY:
+                  - User can pick a new seed when:
+                      • plantStage is bloom  OR
+                      • plantCompleted is true
                 */
                 binding.btnChooseNewSeed.visibility =
-                    if (plantCompleted) View.VISIBLE else View.GONE
+                    if (plantCompleted || plantStage.lowercase() == "bloom") View.VISIBLE else View.GONE
+
+                /*Added by Lesley Del Cid:
+                  Update button text depending on state
+                */
+                binding.btnChooseNewSeed.text =
+                    if (plantCompleted) "Choose New Seed" else "Pick a New Seed"
             }
         }
 
         /*Added by Lesley Del Cid:
-          SEED SELECTION FLOW:
-          - Opens the Seed Pack Activity.
-          - Used after a plant has been completed.
+          SEED SELECTION FLOW
+          - Manual seed picker from Home page.
+          - Milestone popups are handled globally in MainActivity.
         */
         binding.btnChooseNewSeed.setOnClickListener {
             val intent = Intent(requireContext(), com.example.myapplication.Seeds::class.java)
             startActivity(intent)
         }
 
-        //Task
-
+        // TASK SYSTEM
         val repository = TaskRepository()
-
         val adapter = TaskAdapter(mutableListOf()) { task ->
             repository.toggleTask(task)
         }
 
-        binding.taskRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.taskRecyclerView.layoutManager =
+            LinearLayoutManager(requireContext())
         binding.taskRecyclerView.adapter = adapter
 
         repository.listenToTasks { tasks ->
@@ -168,7 +174,6 @@ class HomeFragment : Fragment() {
 
         binding.btnAdd.setOnClickListener {
             val taskText = binding.etTask.text.toString().trim()
-
             if (taskText.isNotEmpty()) {
                 repository.addTask(taskText)
                 binding.etTask.text.clear()
@@ -176,17 +181,51 @@ class HomeFragment : Fragment() {
         }
     }
 
+    /*Added by Lesley Del Cid:
+      showSeedPickerPopup
+      - Allows user to pick a new seed from Home page.
+    */
+    private fun showSeedPickerPopup() {
+
+        val seeds = arrayOf(
+            "Sunflower Seed",
+            "Strawberry Seed",
+            "Lavender Seed"
+        )
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Choose a seed to grow")
+            .setItems(seeds) { _, which ->
+
+                val chosenSeed = seeds[which]
+                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@setItems
+                val userRef = FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(uid)
+
+                val updates = hashMapOf<String, Any>(
+                    "currentSeedId" to chosenSeed,
+                    "plantProgress" to 0,
+                    "plantCompleted" to false,
+                    "plantStage" to "dirt",
+                    "plantSubmits" to 0,
+
+                    // Added by Lesley Del Cid:
+                    // Reset bloomReached so global bloom popup can happen again next cycle
+                    "bloomReached" to false
+                )
+
+                userRef.update(updates)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
 
-        /*
-          CLEANUP:
-          - Removes Firestore listener to prevent memory leaks.
-          - Important because this listener tracks goal + plant state.
-        */
         goalsListener?.remove()
         goalsListener = null
-
         _binding = null
     }
 }

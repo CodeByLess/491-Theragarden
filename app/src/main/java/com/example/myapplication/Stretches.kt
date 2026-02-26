@@ -12,13 +12,19 @@ import androidx.core.view.WindowInsetsCompat
   Stretches Activity
   - Screen for a guided stretch flow
   - Handles navigation (Back / Next)
-  - On Submit, records progress by incrementing the user's completedGoals in Firestore
+  - On Submit:
+      1) Increments the user's completedGoals in Firestore
+      2) Increments the plant growth submit counter (plantSubmits) to update plant stage/progress
   - Then returns the user to the Dashboard tab in MainActivity
 */
 class Stretches : AppCompatActivity() {
 
     // Repository responsible for updating the user's "completedGoals" field in Firestore
     private val goalsRepository = GoalsRepository()
+
+
+    // Repository responsible for updating plant growth when the user submits a completed activity
+    private val plantRepository = PlantRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,13 +52,18 @@ class Stretches : AppCompatActivity() {
 
         // SUBMIT BUTTON:
         // 1) Updates the user's "completedGoals" in Firestore (Goal Tracker)
-        // 2) If successful, navigates back to MainActivity and opens the Dashboard tab
+        // 2) Updates the plant growth fields (plantSubmits, plantStage, plantProgress, plantCompleted)
+        // 3) If successful, navigates back to MainActivity and opens the Dashboard tab
         val submitButton = findViewById<Button>(R.id.btnSubmit)
         submitButton.setOnClickListener {
 
             // Increment goals using a Firestore transaction in GoalsRepository
             goalsRepository.incrementGoals { success ->
                 if (success) {
+
+                    // Each successful submit also contributes to plant growth.
+                    // PlantRepository handles stage thresholds (5 submits → sprout, 10 → bloom, 15 → complete).
+                    plantRepository.incrementPlantSubmits { /* UI updates via Home snapshot listener */ }
 
                     // Relaunch MainActivity as a fresh task, and tell it to open the Dashboard tab
                     val intent = Intent(this, MainActivity::class.java).apply {

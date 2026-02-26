@@ -58,6 +58,36 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtCompletedGoals" />
 
+    <!-- Added by Lesley Del Cid: PLANT STAGE DISPLAY:
+     Shows the plant's current stage (dirt, sprout, bloom).
+     This value is updated dynamically from Firestore (plantStage field). -->
+    <TextView
+        android:id="@+id/txtPlantStage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="Stage: dirt"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtCurrentPlant" />
+
+    <!-- Added by Lesley Del Cid:
+     PLANT IMAGE DISPLAY:
+     Shows dirt/sprout universally, and bloom depends on selected seed. -->
+    <ImageView
+        android:id="@+id/imgPlantStage"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="12dp"
+        android:contentDescription="Plant stage image"
+        android:scaleType="fitCenter"
+        android:src="@drawable/dirt"
+        app:layout_constraintTop_toBottomOf="@id/txtPlantStage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- Added by Lesley Del Cid: PLANT PROGRESS BAR:
          Represents the growth progress of the current plant.
          Progress value (0–100) is updated from Firestore (plantProgress field).
@@ -74,7 +104,7 @@
         android:progress="0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtCurrentPlant" />
+        app:layout_constraintTop_toBottomOf="@id/imgPlantStage" />
 
     <!-- Added by Lesley Del Cid: CHOOSE NEW SEED BUTTON:
          Only becomes visible when plantCompleted == true.
