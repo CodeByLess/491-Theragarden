@@ -63,6 +63,11 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Profile button stays the same
+        binding.btnProfile.setOnClickListener {
+            val intent = Intent(requireContext(), Profile::class.java)
+            startActivity(intent)
+        }
 
         /*Added by Lesley Del Cid:
           GOAL + PLANT INITIALIZATION
