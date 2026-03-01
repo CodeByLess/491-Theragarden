@@ -15,7 +15,7 @@
         android:layout_weight="1"
         android:text="@string/rain"
         android:textSize="16sp"
-        android:textColor="@color/white"
+        android:textColor="#1A1A1A"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"/>
     <!-- This is the progress bar that will hold the music progress -->
@@ -32,8 +32,8 @@
         android:progress="50"/>
     <ImageButton
         android:id="@+id/btnPlayPause"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:src="@android:drawable/ic_media_play"
         android:scaleType="centerInside"
         android:padding="8dp"
