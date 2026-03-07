@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.annotation)
     implementation(libs.firebase.storage)
+    implementation("com.airbnb.android:lottie:6.4.0")
+
 
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

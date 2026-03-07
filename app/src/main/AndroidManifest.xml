@@ -4,6 +4,11 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- Added by Paula Awad: CAMERA PERMISSION
+         Allows the app to access the device camera for capturing gratitude photos.
+         Permission is requested at runtime inside Photo.kt. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,6 +19,96 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Material3.Light"
         tools:targetApi="31">
+
+        <!-- Added by Paula Awad: FILE PROVIDER CONFIGURATION
+             Enables secure file sharing between the app and the camera.
+             Required for saving full-resolution images using FileProvider.
+             References gallery.xml for controlled access to app-specific files. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/gallery" />
+        </provider>
+
+        <activity
+            android:name=".Stretch4"
+            android:exported="false" />
+        <activity
+            android:name=".Stretch3"
+            android:exported="false" />
+        <activity
+            android:name=".Stretch2"
+            android:exported="false" />
+        <activity
+            android:name=".Tutorial"
+            android:exported="false" />
+        <activity
+            android:name=".Report"
+            android:exported="false" />
+        <activity
+            android:name=".Feedback"
+            android:exported="false" />
+
+        <!-- Added by Paula Awad: GRATITUDE PHOTO FEATURE ACTIVITIES
+             Photo activity handles capturing images.
+             GalleryActivity displays saved gratitude images in a RecyclerView grid. -->
+        <activity
+            android:name=".Journal"
+            android:exported="false" />
+        <activity
+            android:name=".Sleep"
+            android:exported="false" />
+        <activity
+            android:name=".Quote"
+            android:exported="false" />
+        <activity
+            android:name=".Photo"
+            android:exported="false" />
+        <activity
+            android:name=".GalleryActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".Doodle"
+            android:exported="false" />
+        <activity
+            android:name=".Music"
+            android:exported="false" />
+        <activity
+            android:name=".Affirmations"
+            android:exported="false" />
+        <activity
+            android:name=".Stretches"
+            android:exported="false" />
+
+        <!-- Added by Paula Awad: BREATHING ACTIVITY
+             Registers the guided breathing feature activity. -->
+        <activity
+            android:name=".Breathing"
+            android:exported="false" />
+
+        <activity
+            android:name=".Hydration"
+            android:exported="false" />
+        <activity
+            android:name=".Sleep"
+            android:exported="false" />
+        <activity
+            android:name=".Mood"
+            android:exported="false" />
+        <activity
+            android:name=".Links"
+            android:exported="false" />
+        <activity
+            android:name=".Share"
+            android:exported="false" />
+        <activity
+            android:name=".Seeds"
+            android:exported="false" />
         <activity
             android:name=".Stretch4"
             android:exported="false" />
@@ -34,6 +129,9 @@
             android:exported="false" />
         <activity
             android:name=".Journal"
+            android:exported="false" />
+        <activity
+            android:name=".Sleep"
             android:exported="false" />
         <activity
             android:name=".Quote"
@@ -84,19 +182,21 @@
             android:name=".Registration"
             android:exported="false"
             android:theme="@style/Theme.Material3.Light.NoActionBar" />
+
         <activity
             android:name=".Login"
             android:exported="true"
             android:theme="@style/Theme.Material3.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true" />
+
     </application>
 
 </manifest>
