@@ -38,9 +38,17 @@ data class PlantData(
       - Used to determine stage thresholds:
             0–4 submits   → dirt
             5–9 submits   → sprout
-            10–14 submits → bloom
-            15 submits    → completed
+            10 submits    → bloom
+            10 submits    → completed
       - Reset to 0 when a new plant is started.
     */
-    val plantSubmits: Int = 0
+    val plantSubmits: Int = 0,
+    /*
+      completedPlants
+      - Tracks the total number of plants the user has fully grown.
+      - This value increases every time a plant reaches the completed stage.
+      - Used for statistics, achievements, or displaying plant history.
+      - Default is 0 for a new user.
+    */
+    val completedPlants: Int = 0
 )

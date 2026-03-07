@@ -23,10 +23,11 @@ import com.example.myapplication.R
   HomeFragment
   - Displays:
       • Completed goals count
+      • Completed plants count
       • Current plant information
       • Plant progress bar
       • "Choose New Seed" button (when plant is complete)
-      •Add a task
+      • Add a task
   - Listens in real-time to the user's Firestore document.
   - Reacts automatically when goal or plant data changes.
 */
@@ -39,6 +40,7 @@ class HomeFragment : Fragment() {
       - Real-time Firestore listener attached to users/{uid}.
       - Monitors both:
           • completedGoals (Goal Tracker)
+          • completedPlants (Plant Tracker)
           • PlantData fields (currentSeedId, plantProgress, plantCompleted)
     */
     private var goalsListener: ListenerRegistration? = null
@@ -75,11 +77,14 @@ class HomeFragment : Fragment() {
 
         /*Added by Lesley Del Cid:
           GOAL + PLANT INITIALIZATION
+          - Reads both goal progress and plant progress from the user's
+            Firestore document in real time.
         */
         val uid = FirebaseAuth.getInstance().currentUser?.uid
 
         if (uid == null) {
             binding.txtCompletedGoals.text = "Goals completed: 0"
+            binding.txtCompletedPlants.text = "Plants completed: 0"
         } else {
 
             val userRef = FirebaseFirestore.getInstance()
@@ -89,9 +94,17 @@ class HomeFragment : Fragment() {
             goalsListener = userRef.addSnapshotListener { snapshot, _ ->
                 if (_binding == null) return@addSnapshotListener
 
-                // GOALS
+                // Added by Lesley Del Cid: GOALS
                 val count = snapshot?.getLong("completedGoals") ?: 0L
                 binding.txtCompletedGoals.text = "Goals completed: $count"
+
+                /*Added by Lesley Del Cid:
+                  COMPLETED PLANTS
+                  - Reads the user's lifetime total of completed plants.
+                  - Defaults to 0 if the field does not exist yet.
+                */
+                val completedPlants = snapshot?.getLong("completedPlants") ?: 0L
+                binding.txtCompletedPlants.text = "Plants completed: $completedPlants"
 
                 // PLANT DATA
                 val currentSeedId = snapshot?.getString("currentSeedId") ?: ""
@@ -99,18 +112,21 @@ class HomeFragment : Fragment() {
                 val plantCompleted = snapshot?.getBoolean("plantCompleted") ?: false
                 val plantStage = snapshot?.getString("plantStage") ?: "dirt"
 
-                // CURRENT PLANT DISPLAY
+                // Added by Lesley Del Cid: CURRENT PLANT DISPLAY
                 binding.txtCurrentPlant.text =
                     if (currentSeedId.isBlank())
                         "Current plant: None"
                     else
                         "Current plant: $currentSeedId"
 
-                // STAGE DISPLAY
+                // Added by Lesley Del Cid: STAGE DISPLAY
                 binding.txtPlantStage.text = "Stage: $plantStage"
 
                 /*Added by Lesley Del Cid:
                   PLANT IMAGE DISPLAY
+                  - Dirt and sprout use shared stage images.
+                  - Bloom uses a seed-specific flower image depending on
+                    the selected seed.
                 */
                 val imageRes = when (plantStage.lowercase()) {
                     "dirt" -> R.drawable.dirt
@@ -120,6 +136,9 @@ class HomeFragment : Fragment() {
                             "Sunflower Seed" -> R.drawable.sunflower
                             "Strawberry Seed" -> R.drawable.strawberry
                             "Lavender Seed" -> R.drawable.lavender
+                            "Tulip Seed" -> R.drawable.tulip
+                            "Cactus Seed" -> R.drawable.cactus
+                            "Monstera Seed" -> R.drawable.monstera
                             else -> R.drawable.sprout
                         }
                     }
@@ -128,17 +147,21 @@ class HomeFragment : Fragment() {
 
                 binding.imgPlantStage.setImageResource(imageRes)
 
-                // PROGRESS BAR
+                // Added by Lesley Del Cid: PROGRESS BAR
                 binding.plantProgressBar.progress = plantProgress
 
                 /*Added by Lesley Del Cid:
                   SEED BUTTON VISIBILITY:
                   - User can pick a new seed when:
-                      • plantStage is bloom  OR
+                      • plantStage is bloom OR
                       • plantCompleted is true
                 */
                 binding.btnChooseNewSeed.visibility =
-                    if (plantCompleted || plantStage.lowercase() == "bloom") View.VISIBLE else View.GONE
+                    if (plantCompleted || plantStage.lowercase() == "bloom") {
+                        View.VISIBLE
+                    } else {
+                        View.GONE
+                    }
 
                 /*Added by Lesley Del Cid:
                   Update button text depending on state
@@ -179,46 +202,6 @@ class HomeFragment : Fragment() {
                 binding.etTask.text.clear()
             }
         }
-    }
-
-    /*Added by Lesley Del Cid:
-      showSeedPickerPopup
-      - Allows user to pick a new seed from Home page.
-    */
-    private fun showSeedPickerPopup() {
-
-        val seeds = arrayOf(
-            "Sunflower Seed",
-            "Strawberry Seed",
-            "Lavender Seed"
-        )
-
-        AlertDialog.Builder(requireContext())
-            .setTitle("Choose a seed to grow")
-            .setItems(seeds) { _, which ->
-
-                val chosenSeed = seeds[which]
-                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@setItems
-                val userRef = FirebaseFirestore.getInstance()
-                    .collection("users")
-                    .document(uid)
-
-                val updates = hashMapOf<String, Any>(
-                    "currentSeedId" to chosenSeed,
-                    "plantProgress" to 0,
-                    "plantCompleted" to false,
-                    "plantStage" to "dirt",
-                    "plantSubmits" to 0,
-
-                    // Added by Lesley Del Cid:
-                    // Reset bloomReached so global bloom popup can happen again next cycle
-                    "bloomReached" to false
-                )
-
-                userRef.update(updates)
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
     }
 
     override fun onDestroyView() {

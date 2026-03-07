@@ -12,20 +12,29 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 /*
- Seeds (Seedpack / Inventory Page)
- - Displays at least 3 starter seeds
- - When user picks a seed:
-     • saves it to Firestore users/{uid}
-     • resets plant progress data
-     • closes this screen (returns to Home)
+  Seeds (Seedpack / Inventory Page)
+  - Displays available starter seeds for the user to choose from.
+  - Allows the user to begin a new plant cycle by selecting a seed.
+  - When the user picks a seed:
+      • saves the selected seed to Firestore users/{uid}
+      • resets only the current plant cycle fields
+      • preserves lifetime plant data such as completedPlants
+      • closes this screen (returns to Home)
 */
 class Seeds : AppCompatActivity() {
 
-    // Starter seeds the user can choose from (inventory)
+    /*
+      Starter seed inventory
+      - These seeds appear as selectable options in the Seedpack screen.
+      - Each seed corresponds to a bloom image shown later in HomeFragment.
+    */
     private val starterSeeds = listOf(
         "Sunflower Seed",
         "Strawberry Seed",
-        "Lavender Seed"
+        "Lavender Seed",
+        "Tulip Seed",
+        "Cactus Seed",
+        "Monstera Seed"
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,26 +48,38 @@ class Seeds : AppCompatActivity() {
             finish() // return to Home
         }
 
-        // Hook up the 3 seed buttons (inventory items)
+        // Hook up the 6 seed buttons (inventory items)
         val seed1 = findViewById<Button>(R.id.btnSeed1)
         val seed2 = findViewById<Button>(R.id.btnSeed2)
         val seed3 = findViewById<Button>(R.id.btnSeed3)
+        val seed4 = findViewById<Button>(R.id.btnSeed4)
+        val seed5 = findViewById<Button>(R.id.btnSeed5)
+        val seed6 = findViewById<Button>(R.id.btnSeed6)
 
         /*
-          Set button labels from our starter seed list
-          (optional, but keeps it consistent if we ever rename seeds)
+          Set button labels from our starter seed list.
+          This keeps the UI text consistent with the seed names stored in code.
         */
         seed1.text = starterSeeds[0]
         seed2.text = starterSeeds[1]
         seed3.text = starterSeeds[2]
+        seed4.text = starterSeeds[3]
+        seed5.text = starterSeeds[4]
+        seed6.text = starterSeeds[5]
 
         /*
-          When a seed is clicked, save it + reset plant data
-          NOTE: Only assign ONE click listener per button
+          When a seed is clicked, save it and reset the current plant cycle.
+
+          NOTE:
+          - Only assign one click listener per button.
+          - The completedPlants total should remain unchanged.
         */
         seed1.setOnClickListener { chooseSeed(starterSeeds[0]) }
         seed2.setOnClickListener { chooseSeed(starterSeeds[1]) }
         seed3.setOnClickListener { chooseSeed(starterSeeds[2]) }
+        seed4.setOnClickListener { chooseSeed(starterSeeds[3]) }
+        seed5.setOnClickListener { chooseSeed(starterSeeds[4]) }
+        seed6.setOnClickListener { chooseSeed(starterSeeds[5]) }
 
         // Window insets (kept)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -70,8 +91,12 @@ class Seeds : AppCompatActivity() {
 
     /*
       chooseSeed(seedName)
-      - Writes plant state to Firestore so HomeFragment updates automatically.
-      - Resets bloomReached + popup memory so sprout/bloom popups work correctly next cycle.
+      - Writes the newly selected seed to Firestore so HomeFragment updates automatically.
+      - Resets only the active plant cycle fields for the next growth cycle.
+      - Does NOT reset completedPlants, because that field stores the user's
+        lifetime total of completed plants.
+      - Resets bloomReached and popup memory so stage popups work correctly
+        for the newly selected plant.
     */
     private fun chooseSeed(seedName: String) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid
@@ -85,16 +110,18 @@ class Seeds : AppCompatActivity() {
             .collection("users")
             .document(uid)
 
-        // Reset plant cycle when selecting a new seed
+        /*
+          Reset only the current plant cycle fields when selecting a new seed.
+          This keeps long-term progress fields, such as completedPlants, intact.
+        */
         val updates = hashMapOf<String, Any>(
             "currentSeedId" to seedName,   // Home shows this as "Current plant: ___"
             "plantProgress" to 0,          // reset progress bar
             "plantCompleted" to false,     // hide "Choose New Seed" button again
-            "plantStage" to "dirt",        // starting stage
-            "plantSubmits" to 0,           // restart submit count
+            "plantStage" to "dirt",        // starting stage for the new plant
+            "plantSubmits" to 0,           // restart submit count for the new plant
 
-            //
-            // Reset bloom flag so bloom popup can happen again for the new plant
+            // Reset bloom flag so the bloom popup can happen again for the new plant
             "bloomReached" to false
         )
 
@@ -102,7 +129,8 @@ class Seeds : AppCompatActivity() {
             .addOnSuccessListener {
 
                 /*
-                  Reset popup memory so global popups don't get stuck/skipped
+                  Reset popup memory so global popups do not get stuck or skipped
+                  when the user starts a new plant cycle.
                 */
                 val prefs = getSharedPreferences("plant_popups", Context.MODE_PRIVATE)
                 prefs.edit()

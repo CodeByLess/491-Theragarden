@@ -49,9 +49,11 @@ class MainActivity : AppCompatActivity() {
 
         handleOpenTab(intent, navView)
     }
+
     /*Added by Lesley Del Cid:
-          setup the plant listener to be able to update the plant stage and know what stage we are on
-        */
+      Set up the global plant listener so the app can detect plant stage
+      changes and show milestone popups across any screen.
+    */
     override fun onStart() {
         super.onStart()
         startGlobalPlantListener()
@@ -78,9 +80,14 @@ class MainActivity : AppCompatActivity() {
     /*Added by Lesley Del Cid:
       startGlobalPlantListener
       - Watches Firestore plant fields globally.
-      - Shows popups when stage changes to sprout or bloom.
-      - Bloom popup allows user to immediately pick a new seed.
+      - Shows a popup when the plant changes to sprout.
+      - Shows a single bloom/completion popup when the plant reaches bloom.
       - Uses SharedPreferences to prevent duplicate popups.
+
+      Important:
+      - In this project, bloom and completion happen at the same threshold.
+      - Because of that, the app should show only ONE final popup at bloom
+        instead of showing both a bloom popup and a separate completion popup.
     */
     private fun startGlobalPlantListener() {
 
@@ -113,7 +120,13 @@ class MainActivity : AppCompatActivity() {
                 return@addSnapshotListener
             }
 
-            // Stage changed
+            /* Added by Lesley Del Cid:
+              Stage changed:
+              - Show sprout popup when the plant first reaches sprout.
+              - Show bloom popup when the plant reaches bloom.
+              - Since bloom and completion happen together in this app,
+                the bloom popup acts as the final milestone popup.
+            */
             if (plantStage != lastStageShown) {
 
                 when (plantStage.lowercase()) {
@@ -128,15 +141,16 @@ class MainActivity : AppCompatActivity() {
                 prefs.edit().putString("lastStageShown", plantStage).apply()
             }
 
-            // Completed
+            /*Added by Lesley Del Cid:
+              Completed:
+              - Update popup memory so completed state stays in sync.
+              - Do not show a second completion popup, because bloom already
+                serves as the final milestone popup in this design.
+            */
             if (plantCompleted != lastCompletedShown) {
-                if (plantCompleted) {
-                    showMessagePopup(
-                        "Plant Complete!",
-                        "Your plant is fully grown. You can pick a new seed now."
-                    )
-                }
-                prefs.edit().putBoolean("lastCompletedShown", plantCompleted).apply()
+                prefs.edit()
+                    .putBoolean("lastCompletedShown", plantCompleted)
+                    .apply()
             }
         }
     }
@@ -153,15 +167,16 @@ class MainActivity : AppCompatActivity() {
 
     /*Added by Lesley Del Cid:
       showBloomPopup
-      - Appears when plant hits bloom.
-      - Allows user to pick a new seed immediately.
+      - Appears when the plant reaches bloom.
+      - In this project, bloom also means the plant is completed.
+      - Allows the user to immediately choose a new seed for the next cycle.
     */
     private fun showBloomPopup() {
         if (isFinishing) return
 
         AlertDialog.Builder(this)
             .setTitle("Bloomed!")
-            .setMessage("Your plant bloomed! Would you like to pick a new seed?")
+            .setMessage("Your plant bloomed and is fully grown! Would you like to pick a new seed?")
             .setPositiveButton("Pick New Seed") { _, _ ->
                 val intent = Intent(this, Seeds::class.java)
                 startActivity(intent)
@@ -170,24 +185,15 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun showSeedPickerPopup() {
 
-        val seeds = arrayOf(
-            "Sunflower Seed",
-            "Strawberry Seed",
-            "Lavender Seed"
-        )
-
-        AlertDialog.Builder(this)
-            .setTitle("Choose a seed to grow")
-            .setItems(seeds) { _, which ->
-                val chosenSeed = seeds[which]
-                startNewPlantCycle(chosenSeed)
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
+    /*Added by Lesley Del Cid:
+      startNewPlantCycle
+      - Resets only the current plant cycle fields for the newly selected seed.
+      - Does not reset completedPlants because that field stores the user's
+        lifetime total of completed plants.
+      - Also resets popup memory so milestone popups can appear again for
+        the next plant cycle.
+    */
     private fun startNewPlantCycle(chosenSeed: String) {
 
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return

@@ -42,6 +42,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_home" />
 
+    <!-- Added by Lesley Del Cid: COMPLETED PLANTS DISPLAY:
+         Shows the total number of plants the user has fully completed.
+         This value is updated in real-time from Firestore using the
+         completedPlants field in the user's document. -->
+    <TextView
+        android:id="@+id/txtCompletedPlants"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Plants completed: 0"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtCompletedGoals" />
+
     <!-- Added by Lesley Del Cid: CURRENT PLANT DISPLAY:
          Displays the ID/name of the active seed the user is currently growing.
          If no plant is selected, this shows "Current plant: None".
@@ -56,7 +72,7 @@
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtCompletedGoals" />
+        app:layout_constraintTop_toBottomOf="@id/txtCompletedPlants" />
 
     <!-- Added by Lesley Del Cid: PLANT STAGE DISPLAY:
      Shows the plant's current stage (dirt, sprout, bloom).
@@ -91,7 +107,7 @@
     <!-- Added by Lesley Del Cid: PLANT PROGRESS BAR:
          Represents the growth progress of the current plant.
          Progress value (0–100) is updated from Firestore (plantProgress field).
-         Max is set to 100 assuming percentage-based growth. -->
+         Max is set to 100 percentage-based growth. -->
     <ProgressBar
         android:id="@+id/plantProgressBar"
         style="?android:attr/progressBarStyleHorizontal"
@@ -153,7 +169,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

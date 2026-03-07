@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 
@@ -13,6 +14,8 @@ import com.google.firebase.firestore.SetOptions
       • Starting a new plant cycle (selecting a seed)
       • Updating plant progress and automatically assigning plant stages
         (dirt → sprout → bloom) using threshold rules
+      • Tracking the total number of plants the user has completed
+      • Saving completed plant entries into the user's garden collection
 */
 class PlantRepository {
 
@@ -31,6 +34,11 @@ class PlantRepository {
       - Initializes plantStage as "dirt" (first stage).
       - Uses SetOptions.merge() to avoid overwriting other user data.
 
+      IMPORTANT:
+      - Only the CURRENT plant fields should reset here.
+      - The completedPlants field should not reset, because it stores
+        the user's lifetime total of completed plants.
+
       Parameters:
       seedId → The ID/name of the selected seed (e.g., "sunflower").
       onDone → Callback returning:
@@ -46,27 +54,23 @@ class PlantRepository {
         // Reference to users/{uid} document
         val docRef = db.collection("users").document(uid)
 
-        // Create a new PlantData object with reset progress
-        val newPlant = PlantData(
-            currentSeedId = seedId,   // store selected seed
-            plantProgress = 0,        // reset growth progress
-            plantCompleted = false,   // mark as active (not completed)
-            plantStage = "dirt",      // start stage of all plants
-
-
-            // Reset submit count when the user starts a brand new plant
-            plantSubmits = 0
+        /*
+          Reset only the active plant fields.
+          Do not include completedPlants here, or it would reset back to 0
+          every time the user chooses a new seed.
+        */
+        val newPlantData = mapOf(
+            "currentSeedId" to seedId,   // store selected seed
+            "plantProgress" to 0,        // reset growth progress
+            "plantCompleted" to false,   // mark as active (not completed)
+            "plantStage" to "dirt",      // start stage of all plants
+            "plantSubmits" to 0,         // reset submit count for the new plant
+            "bloomReached" to false      // reset bloom popup flag for new cycle
         )
 
         // Update Firestore using merge so other user fields remain intact
-        docRef.set(newPlant, SetOptions.merge())
+        docRef.set(newPlantData, SetOptions.merge())
             .addOnSuccessListener {
-
-
-                // Reset bloomReached flag when starting a new plant cycle
-                // This is used later for showing bloom popups anywhere in the app
-                docRef.set(mapOf("bloomReached" to false), SetOptions.merge())
-
                 onDone(true)  // Notify caller that update succeeded
             }
             .addOnFailureListener {
@@ -85,12 +89,6 @@ class PlantRepository {
       - 34 to 66  → sprout
       - 67 to 99  → bloom
       - 100+      → bloom + completed
-
-      Why this exists:
-      - Keeps the stage logic in ONE place (repository),
-        so Activities/Fragments only pass in the new progress value.
-      - Ensures Firestore fields stay consistent:
-          plantProgress, plantStage, and plantCompleted update together.
 
       Parameters:
       newProgress → New progress value (expected 0–100).
@@ -142,16 +140,30 @@ class PlantRepository {
       - Called when the user submits a completed self-care activity (ex: Stretch Submit).
       - Increments plantSubmits by 1 and updates plantStage/plantProgress automatically.
       - Uses a Firestore transaction so the submit count updates safely (no race conditions).
+      - Also updates completedPlants when a plant reaches the completed stage.
+      - Saves the completed plant name into the user's garden collection
+        the first time that plant reaches completion.
 
       Stage Thresholds (based on submits):
       - 0–4 submits   → dirt
       - 5–9 submits   → sprout
-      - 10–14 submits → bloom
-      - 15 submits    → completed (shows "Choose New Seed" on Home)
+      - 10+ submits   → bloom + completed
 
       Progress Bar:
       - Converts plantSubmits into a percentage so the Home progress bar can still show growth.
-      - Example: 15 submits = 100%
+      - Example: 10 submits = 100%
+
+      completedPlants:
+      - Stores the total number of plants the user has fully completed.
+      - Increases only once when the plant changes from not completed
+        to completed.
+      - This prevents duplicate counting if the user somehow submits again
+        after the plant is already complete.
+
+      garden:
+      - Saves a completed plant entry into users/{uid}/garden.
+      - Each entry stores the completed seed name and a completion timestamp.
+      - A new garden entry is added only once per completed plant cycle.
     */
     fun incrementPlantSubmits(onDone: (Boolean) -> Unit) {
 
@@ -162,12 +174,41 @@ class PlantRepository {
         // Reference to users/{uid} document
         val docRef = db.collection("users").document(uid)
 
+        /*
+          Used after the transaction completes successfully.
+          If a plant finishes for the first time, we save its name into
+          the user's garden collection.
+        */
+        var shouldSaveToGarden = false
+        var completedSeedName = ""
+
         db.runTransaction { transaction ->
             val snapshot = transaction.get(docRef)
 
             // Read current submit count (default to 0 if missing)
             val currentSubmits = snapshot.getLong("plantSubmits")?.toInt() ?: 0
             val newSubmits = currentSubmits + 1
+
+            /*
+              Read whether the plant had already been completed before
+              this new submit.
+              This is used to prevent completedPlants from increasing more
+              than once for the same plant.
+            */
+            val wasAlreadyCompleted = snapshot.getBoolean("plantCompleted") ?: false
+
+            /*
+              Read the user's current total number of completed plants.
+              If the field does not exist yet, start from 0.
+            */
+            val currentCompletedPlants = snapshot.getLong("completedPlants")?.toInt() ?: 0
+
+            /*
+              Read the currently active seed name.
+              This value will be saved into the user's garden collection
+              if the plant becomes completed for the first time.
+            */
+            val currentSeedId = snapshot.getString("currentSeedId") ?: ""
 
             // Determine stage from submit thresholds
             val stage = when {
@@ -180,9 +221,31 @@ class PlantRepository {
             // This is used later to trigger a bloom popup on any screen
             val bloomReached = newSubmits >= 10
 
-            // Completed after 15 submits
-            val completed = newSubmits >= 15
+            // Plant becomes completed at 10 submits
+            val completed = newSubmits >= 10
 
+            /*
+              Increase completedPlants only the FIRST time the current plant
+              reaches completion.
+              Example:
+              - 9 → 10 submits = increment completedPlants
+              - 10 → 11 submits = do NOT increment again
+            */
+            val updatedCompletedPlants =
+                if (completed && !wasAlreadyCompleted) {
+                    currentCompletedPlants + 1
+                } else {
+                    currentCompletedPlants
+                }
+
+            /*
+              Mark this plant to be saved into the user's garden only once,
+              when it changes from not completed to completed.
+            */
+            if (completed && !wasAlreadyCompleted && currentSeedId.isNotBlank()) {
+                shouldSaveToGarden = true
+                completedSeedName = currentSeedId
+            }
 
             // Make progress bar look "full" once bloom is reached (10+ submits)
             val progress = if (newSubmits >= 10) 100
@@ -196,12 +259,40 @@ class PlantRepository {
                     "plantStage" to stage,
                     "bloomReached" to bloomReached,
                     "plantCompleted" to completed,
-                    "plantProgress" to progress
+                    "plantProgress" to progress,
+
+                    // Stores the user's lifetime total of completed plants
+                    "completedPlants" to updatedCompletedPlants
                 ),
                 SetOptions.merge()
             )
         }.addOnSuccessListener {
-            onDone(true)
+
+            /*
+              Save the completed plant into the user's garden collection
+              after the transaction succeeds.
+              This creates a new garden document for each completed plant.
+            */
+            if (shouldSaveToGarden) {
+                val gardenEntry = mapOf(
+                    "seedName" to completedSeedName,
+                    "completedAt" to FieldValue.serverTimestamp()
+                )
+
+                db.collection("users")
+                    .document(uid)
+                    .collection("garden")
+                    .add(gardenEntry)
+                    .addOnSuccessListener {
+                        onDone(true)
+                    }
+                    .addOnFailureListener {
+                        onDone(false)
+                    }
+            } else {
+                onDone(true)
+            }
+
         }.addOnFailureListener {
             onDone(false)
         }

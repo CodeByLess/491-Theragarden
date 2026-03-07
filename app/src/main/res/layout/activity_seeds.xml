@@ -31,7 +31,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="32dp" />
 
-    <!-- Seed 1 -->
+    <!-- Seed 1
+         Additional selectable seed for the user's seed inventory. -->
     <Button
         android:id="@+id/btnSeed1"
         android:layout_width="0dp"
@@ -44,7 +45,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Seed 2 -->
+    <!-- Seed 2
+         Additional selectable seed for the user's seed inventory. -->
     <Button
         android:id="@+id/btnSeed2"
         android:layout_width="0dp"
@@ -57,7 +59,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Seed 3 -->
+    <!-- Seed 3
+         Additional selectable seed for the user's seed inventory. -->
     <Button
         android:id="@+id/btnSeed3"
         android:layout_width="0dp"
@@ -67,6 +70,48 @@
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
         app:layout_constraintTop_toBottomOf="@id/btnSeed2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Seed 4
+         Additional selectable seed for the user's seed inventory. -->
+    <Button
+        android:id="@+id/btnSeed4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Tulip Seed"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        app:layout_constraintTop_toBottomOf="@id/btnSeed3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Seed 5
+         Additional selectable seed for the user's seed inventory. -->
+    <Button
+        android:id="@+id/btnSeed5"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Cactus Seed"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        app:layout_constraintTop_toBottomOf="@id/btnSeed4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Seed 6
+         Additional selectable seed for the user's seed inventory. -->
+    <Button
+        android:id="@+id/btnSeed6"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Monstera Seed"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        app:layout_constraintTop_toBottomOf="@id/btnSeed5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
