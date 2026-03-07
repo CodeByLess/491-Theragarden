@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/dark_gray_brown"
-    tools:context=".Stretches">
+    tools:context=".Stretch4">
 
     <Button
         android:id="@+id/btnBack"
@@ -17,25 +17,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-
-    <Button
-        android:id="@+id/btnNext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_marginTop="16dp"
-        android:text="Next"
-        app:layout_constraintEnd_toEndOf="@id/greenBox"
-        app:layout_constraintTop_toBottomOf="@id/greenBox" />
-
     <Button
         android:id="@+id/btnSubmit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="156dp"
+        android:layout_margin="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="136dp"
         android:text="Submit"
-        app:layout_constraintBottom_toBottomOf="@id/btnNext"
-        app:layout_constraintEnd_toStartOf="@id/btnNext" />
+        app:layout_constraintEnd_toEndOf="@id/greenBox"
+        app:layout_constraintTop_toBottomOf="@id/greenBox" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/greenBox"
@@ -63,7 +54,7 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="1. Neck Roll"
+                android:text="4. Side Stretch"
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
                 android:textStyle="bold"
@@ -75,20 +66,16 @@
                 android:id="@+id/tvInstructions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="• Sit or stand tall.
-                \n• Slowly tilt your head toward your right shoulder.
-                \n• Roll forward, then left, completing a slow circle.
-                \n\nRepeat 3 times each direction.
-                \nInhale as your head rises, exhale as it falls.
-                \n\n\n\n\n                         Press submit if you are done
-                \n\                                                 or
-                \n                    click next for another guided stretch"
+                android:lineSpacingExtra="4dp"
+                android:text="• Raise your right arm overhead and gently lean to the left.
+                \n• Feel the stretch along your ribs and side.
+                \n• Hold for 10 seconds, thenswitch sides
+                \n• Inhale tall, exhale as you lean.
+                \n\n\n\n\n                         Press submit if you are done"
                 android:textColor="@android:color/white"
-                android:textSize="14sp"
-                android:lineSpacingExtra="4dp"/>
+                android:textSize="14sp" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
