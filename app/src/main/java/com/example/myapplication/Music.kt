@@ -12,9 +12,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.LinearLayoutManager
 
-// In Progress -- Music feature will display different music options to choose from, chosen song will
+// Music feature will display different music options to choose from, chosen song will
 // play and display progress bar
+
 class Music : AppCompatActivity() {
+
+
+// Initialize lists and var
 
     private lateinit var rvMusicList: RecyclerView
     private lateinit var musicAdapter: MusicAdapter
@@ -23,7 +27,7 @@ class Music : AppCompatActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
     private var progressRunnable: Runnable? = null
-
+    //list of music mp3 files
     private val musicList = mutableListOf(
         MusicTitle("Bird Chirping", R.raw.bird_chirping),
         MusicTitle("Ocean Waves", R.raw.ocean_waves),
@@ -49,6 +53,7 @@ class Music : AppCompatActivity() {
         rvMusicList.adapter = musicAdapter
 
     }
+    //handles the play and pause buttons-uses list and checks position
     private fun handlePlayPause(position: Int) {
         if (currentPlayingIndex == position) {
             if (mediaPlayer?.isPlaying == true) {
@@ -66,6 +71,7 @@ class Music : AppCompatActivity() {
         }
         musicAdapter.notifyDataSetChanged()
     }
+    //handles play, checks position and updates progress bar if play button is clicked
     private fun playTrack(position: Int) {
         try {
             mediaPlayer = MediaPlayer.create(this, musicList[position].audioResId)
@@ -90,6 +96,7 @@ class Music : AppCompatActivity() {
             ).show()
         }
     }
+    //Checks if pause button pressed and updates progress bar
     private fun stopCurrentTrack() {
         if (currentPlayingIndex >= 0) {
             musicList[currentPlayingIndex].isPlaying = false
@@ -100,6 +107,7 @@ class Music : AppCompatActivity() {
         mediaPlayer = null
         stopProgressUpdate()
     }
+    //changes the position of the progress bar
     private fun startProgressUpdate(position: Int) {
         progressRunnable = object : Runnable {
             override fun run() {
