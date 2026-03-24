@@ -33,6 +33,8 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         handleOpenTab(intent, navView)
+
+        QuizManager(this).checkAndShowQuiz()
     }
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
