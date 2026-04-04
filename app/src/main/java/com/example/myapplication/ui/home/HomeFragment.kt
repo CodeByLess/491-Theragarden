@@ -65,6 +65,24 @@ class HomeFragment : Fragment() {
 
         return root
     }
+    // Added by Lesley Del Cid:
+// Updates the custom vertical growth meter based on the plant's progress
+// percentage from Firestore. The fill grows from bottom to top.
+    private fun updateVerticalPlantMeter(progress: Int) {
+        val safeProgress = progress.coerceIn(0, 100)
+
+        binding.plantMeterContainer.post {
+            val totalHeight = binding.plantMeterContainer.height
+            val topCapHeight = binding.plantMeterTopCap.height
+            val usableHeight = totalHeight - topCapHeight
+
+            val fillHeight = (usableHeight * (safeProgress / 100f)).toInt()
+
+            val params = binding.plantMeterFill.layoutParams
+            params.height = fillHeight
+            binding.plantMeterFill.layoutParams = params
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -108,7 +126,10 @@ class HomeFragment : Fragment() {
 
                 // PLANT DATA
                 val currentSeedId = snapshot?.getString("currentSeedId") ?: ""
+                //added by lesley: updates plant progress bar
                 val plantProgress = snapshot?.getLong("plantProgress")?.toInt() ?: 0
+                binding.plantProgressBar.progress = plantProgress
+                updateVerticalPlantMeter(plantProgress)
                 val plantCompleted = snapshot?.getBoolean("plantCompleted") ?: false
                 val plantStage = snapshot?.getString("plantStage") ?: "dirt"
 
@@ -148,7 +169,7 @@ class HomeFragment : Fragment() {
                 binding.imgPlantStage.setImageResource(imageRes)
 
                 // Added by Lesley Del Cid: PROGRESS BAR
-                binding.plantProgressBar.progress = plantProgress
+                updateVerticalPlantMeter(plantProgress)
 
                 /*Added by Lesley Del Cid:
                   SEED BUTTON VISIBILITY:

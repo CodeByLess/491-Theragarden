@@ -181,6 +181,7 @@ class PlantRepository {
         */
         var shouldSaveToGarden = false
         var completedSeedName = ""
+        var nextGardenOrder = 0 // added by Lesley: allows for rearranging garden
 
         db.runTransaction { transaction ->
             val snapshot = transaction.get(docRef)
@@ -245,6 +246,7 @@ class PlantRepository {
             if (completed && !wasAlreadyCompleted && currentSeedId.isNotBlank()) {
                 shouldSaveToGarden = true
                 completedSeedName = currentSeedId
+                nextGardenOrder = currentCompletedPlants // added by Lesley: for garden screen
             }
 
             // Make progress bar look "full" once bloom is reached (10+ submits)
@@ -276,7 +278,8 @@ class PlantRepository {
             if (shouldSaveToGarden) {
                 val gardenEntry = mapOf(
                     "seedName" to completedSeedName,
-                    "completedAt" to FieldValue.serverTimestamp()
+                    "completedAt" to FieldValue.serverTimestamp(),
+                    "order" to nextGardenOrder // added by Lesley: for garden screen
                 )
 
                 db.collection("users")
