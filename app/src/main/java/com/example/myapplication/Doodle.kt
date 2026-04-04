@@ -2,26 +2,34 @@ package com.example.myapplication
 
 import android.os.Bundle
 import android.widget.Button
-import androidx.activity.enableEdgeToEdge
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import android.content.Intent
 
 class Doodle : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_doodle)
 
-        val backButton = findViewById<Button>(R.id.btnBack)
-        backButton.setOnClickListener {
-            finish() // return to Home
+        val btnBack = findViewById<Button>(R.id.btnBack)
+        val btnSave = findViewById<Button>(R.id.btnSave)
+        val btnLibrary = findViewById<Button>(R.id.btnLibrary)
+
+
+
+        btnBack.setOnClickListener {
+            finish()
+        }
+        // Placeholder actions (for now)
+        btnSave.setOnClickListener {
+            Toast.makeText(this, "Save coming soon", Toast.LENGTH_SHORT).show()
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        btnLibrary.setOnClickListener {
+            startActivity(Intent(this, LibraryDoodle::class.java))
         }
+
+
     }
 }
