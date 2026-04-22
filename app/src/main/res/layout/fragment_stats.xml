@@ -1,25 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<!-- Scrollable container to ensure content fits on all screen sizes -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.Stats">
+    android:background="@color/dark_gray_brown"
+    android:padding="16dp">
 
-
-
-    <TextView
-        android:id="@+id/text_stat"
+    <!-- Main vertical layout for stacking UI elements -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:orientation="vertical">
+
+        <!-- Page title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mood Statistics"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Line chart displaying mood trends over time -->
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/moodChart"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Container for mood statistics -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/gray_green"
+            android:padding="14dp"
+            android:layout_marginBottom="16dp">
+
+            <!-- Latest mood entry -->
+            <TextView
+                android:id="@+id/tvLatestMood"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Latest: --"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Average mood value -->
+            <TextView
+                android:id="@+id/tvAverageMood"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Average: --"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Highest recorded mood -->
+            <TextView
+                android:id="@+id/tvHighestMood"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Highest: --"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Lowest recorded mood -->
+            <TextView
+                android:id="@+id/tvLowestMood"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lowest: --"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Total number of mood entries -->
+            <TextView
+                android:id="@+id/tvTotalEntries"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Entries: 0"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <!-- Message shown based on user mood trends -->
+        <TextView
+            android:id="@+id/tvSupportMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Button to navigate to self-care tools if needed -->
+        <Button
+            android:id="@+id/btnSelfCareHub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go to Self-Care Hub"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/gray_green"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Status text for loading or error messages -->
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+</ScrollView>

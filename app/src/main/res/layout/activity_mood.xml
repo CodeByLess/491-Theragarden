@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_gray_brown"
     android:orientation="horizontal"
+    android:background="@color/dark_gray_brown"
+    android:fitsSystemWindows="true"
+    android:paddingTop="32dp"
     tools:context=".Mood">
 
     <RelativeLayout
@@ -19,81 +22,79 @@
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:text="@string/back"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="Back" />
+
         <TextView
             android:id="@+id/mood"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:layout_below="@id/btnBack"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp"
             android:text="@string/mood"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white"
             android:textSize="30sp"
-            android:background="@drawable/rounded_corners"/>
+            android:background="@drawable/rounded_corners" />
+
         <TextView
             android:id="@+id/date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/mood"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="12dp"
-            android:layout_below="@id/mood"
-            android:text=""
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white"
             android:textSize="20sp"
-            android:background="@drawable/rounded_corners"/>
+            android:background="@drawable/rounded_corners" />
 
         <ImageButton
-            android:padding="20dp"
             android:id="@+id/happyButton"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:layout_centerHorizontal="true"
             android:layout_below="@id/date"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:padding="20dp"
             android:src="@drawable/happy"
             android:scaleType="centerInside"
-            android:adjustViewBounds="true"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/happy"/>
+            android:contentDescription="@string/happy" />
 
         <ImageButton
-            android:padding="0dp"
             android:id="@+id/okayButton"
-            android:layout_centerHorizontal="true"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:scaleType="centerInside"
-            android:adjustViewBounds="true"
-            android:src="@drawable/okay"
             android:layout_below="@id/happyButton"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/okaybutton"/>
-        <ImageButton
-            android:padding="15dp"
-            android:id="@+id/madButton"
             android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/okay"
+            android:scaleType="centerInside"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/okaybutton" />
+
+        <ImageButton
+            android:id="@+id/madButton"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:scaleType="centerInside"
-            android:src="@drawable/mad"
             android:layout_below="@id/okayButton"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:padding="15dp"
+            android:src="@drawable/mad"
+            android:scaleType="centerInside"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/madbutton"
-            />
+            android:contentDescription="@string/madbutton" />
 
         <Button
             android:id="@+id/SubmitMood"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginEnd="13dp"
-            android:layout_marginBottom="28dp"
-            android:layout_toStartOf="@id/madButton"
+            android:layout_marginBottom="109dp"
             android:text="@string/submit" />
 
     </RelativeLayout>
-
 
 </LinearLayout>
