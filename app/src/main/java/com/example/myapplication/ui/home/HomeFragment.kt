@@ -65,9 +65,10 @@ class HomeFragment : Fragment() {
 
         return root
     }
+
     // Added by Lesley Del Cid:
-// Updates the custom vertical growth meter based on the plant's progress
-// percentage from Firestore. The fill grows from bottom to top.
+    // Updates the custom vertical growth meter based on the plant's progress
+    // percentage from Firestore. The fill grows from bottom to top.
     private fun updateVerticalPlantMeter(progress: Int) {
         val safeProgress = progress.coerceIn(0, 100)
 
@@ -126,7 +127,6 @@ class HomeFragment : Fragment() {
 
                 // PLANT DATA
                 val currentSeedId = snapshot?.getString("currentSeedId") ?: ""
-                //added by lesley: updates plant progress bar
                 val plantProgress = snapshot?.getLong("plantProgress")?.toInt() ?: 0
                 binding.plantProgressBar.progress = plantProgress
                 updateVerticalPlantMeter(plantProgress)
@@ -204,9 +204,29 @@ class HomeFragment : Fragment() {
 
         // TASK SYSTEM
         val repository = TaskRepository()
-        val adapter = TaskAdapter(mutableListOf()) { task ->
-            repository.toggleTask(task)
-        }
+
+        // Added by Lesley:
+        // The adapter now supports both checking tasks and deleting tasks.
+        // Checking a task toggles its completion status.
+        // Long pressing a task opens a confirmation dialog before deletion.
+        val adapter = TaskAdapter(
+            mutableListOf(),
+            { task ->
+                repository.toggleTask(task)
+            },
+            { task ->
+                // Added by Lesley:
+                // Confirmation dialog prevents accidental deletion of tasks.
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Delete Task")
+                    .setMessage("Are you sure you want to delete this task?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        repository.deleteTask(task)
+                    }
+                    .setNegativeButton("No", null)
+                    .show()
+            }
+        )
 
         binding.taskRecyclerView.layoutManager =
             LinearLayoutManager(requireContext())
