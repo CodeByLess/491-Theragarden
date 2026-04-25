@@ -31,7 +31,7 @@ class Links : AppCompatActivity() {
         val btnLAHelp = findViewById<Button>(R.id.btnLAHelp)
         val btnMentalHealth = findViewById<Button>(R.id.btnMentalHealth)
 
-        // Click listeners
+        // website links
         btn988.setOnClickListener { openLink("https://988lifeline.org/") }
         btnCrisisText.setOnClickListener { openLink("https://www.crisistextline.org/") }
         btnNami.setOnClickListener { openLink("https://www.nami.org/") }
@@ -40,7 +40,7 @@ class Links : AppCompatActivity() {
         btnLAHelp.setOnClickListener { openLink("https://dmh.lacounty.gov/") }
         btnMentalHealth.setOnClickListener { openLink("https://www.mentalhealth.com/") }
 
-        // Edge-to-edge
+        // edge to edge
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)

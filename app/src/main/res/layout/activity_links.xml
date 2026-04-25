@@ -30,7 +30,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
-    <!-- 988 -->
+
     <Button
         android:id="@+id/btn988"
         android:layout_width="0dp"
