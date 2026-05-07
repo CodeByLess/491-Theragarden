@@ -5,39 +5,41 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class Mood : AppCompatActivity() {
+
+    // Firebase instances for authentication and database
     // Variable declarations for firebase and features
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
+    // UI components
     private lateinit var btnSubmit: Button
     private lateinit var btnHappy: ImageButton
     private lateinit var btnOkay: ImageButton
     private lateinit var btnMad: ImageButton
-    private lateinit var tvDate : TextView
+    private lateinit var tvDate: TextView
 
+    // Stores the currently selected mood
     private var selectedMood: String? = null
-
-    // For the calendar mood tracker just add the adapter and recycler view to this file
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_mood)
+
+        // Initialize Firebase
         // Connection to firebase and firestore
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
+
+        // Bind UI elements
         // Connect to UI elements by their ids
         val backButton = findViewById<Button>(R.id.btnBack)
         btnHappy = findViewById(R.id.happyButton)
@@ -46,73 +48,113 @@ class Mood : AppCompatActivity() {
         btnSubmit = findViewById(R.id.SubmitMood)
         tvDate = findViewById(R.id.date)
 
+        // Display today's date
         setTodaysDate()
 
+        // Navigate back to previous screen
         backButton.setOnClickListener {
             finish() // return to Home
         }
+
+        // Mood selection listeners
         // Mood button click listeners
         btnHappy.setOnClickListener {
             selectMood("happy")
         }
+
         btnOkay.setOnClickListener {
             selectMood("okay")
         }
+
         btnMad.setOnClickListener {
             selectMood("mad")
         }
 
-        btnSubmit.setOnClickListener { // Check if user selected mood and save if yes, if no send message
+        // Submit mood to database
+        btnSubmit.setOnClickListener {
+
+            // Check if user selected mood and save if yes, if no send message
             if (selectedMood != null) {
                 saveMood()
-            }
-            else{
+            } else {
                 Toast.makeText(this, "Please select a mood first", Toast.LENGTH_SHORT).show()
             }
         }
+
         // System UI padding
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                systemBars.bottom
+            )
+
             insets
         }
     }
 
-    private fun selectMood (mood: String) { // Mood selection, updates mood when selected
+    // Updates selected mood and highlights the chosen button
+    // Mood selection, updates mood when selected
+    private fun selectMood(mood: String) {
+
         selectedMood = mood
 
+        // Highlight selected mood visually
         btnHappy.isSelected = (mood == "happy")
         btnOkay.isSelected = (mood == "okay")
         btnMad.isSelected = (mood == "mad")
-
     }
 
-    private fun setTodaysDate() { // Updates date in format
-        val dateFormat = SimpleDateFormat("EEEE, MMMM dd, yyyy", Locale.getDefault())
-        val currentDate = dateFormat.format(Date())
-        tvDate.text = "Log mood for $currentDate"
+    // Formats and displays the current date
+    // Updates date in format
+    private fun setTodaysDate() {
+
+        val dateFormat =
+            SimpleDateFormat("EEEE, MMMM dd, yyyy", Locale.getDefault())
+
+        tvDate.text =
+            "Log mood for ${dateFormat.format(Date())}"
     }
 
-    private fun saveMood() { // save moods in firebase to its corresponding user as long as its is logged in
+    // Saves the selected mood to Firestore under the current user
+    // save moods in firebase to its corresponding user as long as its is logged in
+    private fun saveMood() {
+
+        // Ensure user is logged in
         val uid = auth.currentUser?.uid ?: run {
-            Toast.makeText(this, "You must be logged in", Toast.LENGTH_SHORT).show()
+
+            Toast.makeText(
+                this,
+                "You must be logged in",
+                Toast.LENGTH_SHORT
+            ).show()
+
             return
         }
-        val entry = hashMapOf( // mood and time is chose at saved to database under its user
+
+        // Create mood entry object
+        // mood and time is chose at saved to database under its user
+        val entry = hashMapOf(
             "mood" to selectedMood,
-            "createdAt" to System.currentTimeMillis()
+            "createdAt" to System.currentTimeMillis() // timestamp for sorting and analytics
         )
+
+        // Store mood entry in Firestore
         // Database collections created under users and mood entries
         db.collection("users")
             .document(uid)
             .collection("moodEntries")
             .add(entry)
+
             .addOnSuccessListener {
                 Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show()
-
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Save failed: ${e.message}", Toast.LENGTH_SHORT).show()
+
+            .addOnFailureListener {
+                Toast.makeText(this, "Save failed", Toast.LENGTH_SHORT).show()
             }
     }
 }
