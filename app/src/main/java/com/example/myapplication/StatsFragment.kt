@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.stats
+package com.example.myapplication.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.example.myapplication.MoodEntry
 import com.example.myapplication.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.myapplication.ui.MoodEntry
 
 class StatsFragment : Fragment() {
 
@@ -89,6 +89,7 @@ class StatsFragment : Fragment() {
 
                 // Convert Firestore documents into MoodEntry objects
                 for (doc in result.documents) {
+
                     val mood = doc.getString("mood") ?: continue
                     val createdAt = doc.getLong("createdAt") ?: 0L
 
@@ -108,10 +109,14 @@ class StatsFragment : Fragment() {
                 }
 
                 // Convert moods into numeric scores for analysis
-                val moodScores = entries.map { moodToScore(it.mood) }
+                val moodScores = entries.map {
+                    moodToScore(it.mood)
+                }
 
                 // Find latest entry based on timestamp
-                val latestEntry = entries.maxByOrNull { it.createdAt }
+                val latestEntry = entries.maxByOrNull {
+                    it.createdAt
+                }
 
                 // Calculate statistics
                 val average = moodScores.average()
@@ -120,21 +125,38 @@ class StatsFragment : Fragment() {
 
                 // Update UI with computed values
                 tvLatestMood.text =
-                    "Latest Mood: ${latestEntry?.mood?.replaceFirstChar { it.uppercase() } ?: "--"}"
-                tvAverageMood.text = "Average Mood: ${"%.2f".format(average)} / 3"
-                tvHighestMood.text = "Highest Mood: ${scoreToMood(highestScore)}"
-                tvLowestMood.text = "Lowest Mood: ${scoreToMood(lowestScore)}"
-                tvTotalEntries.text = "Total Entries: ${entries.size}"
+                    "Latest Mood: ${
+                        latestEntry?.mood?.replaceFirstChar {
+                            it.uppercase()
+                        } ?: "--"
+                    }"
+
+                tvAverageMood.text =
+                    "Average Mood: ${"%.2f".format(average)} / 3"
+
+                tvHighestMood.text =
+                    "Highest Mood: ${scoreToMood(highestScore)}"
+
+                tvLowestMood.text =
+                    "Lowest Mood: ${scoreToMood(lowestScore)}"
+
+                tvTotalEntries.text =
+                    "Total Entries: ${entries.size}"
+
                 tvStatus.text = "Mood statistics loaded."
             }
+
             .addOnFailureListener { e ->
+
                 // Handle database errors
-                tvStatus.text = "Failed to load mood statistics: ${e.message}"
+                tvStatus.text =
+                    "Failed to load mood statistics: ${e.message}"
             }
     }
 
     // Converts mood string into numeric score for calculations
     private fun moodToScore(mood: String): Int {
+
         return when (mood.lowercase()) {
             "happy" -> 3
             "okay" -> 2
@@ -145,6 +167,7 @@ class StatsFragment : Fragment() {
 
     // Converts numeric score back into readable mood label
     private fun scoreToMood(score: Int): String {
+
         return when (score) {
             3 -> "Happy"
             2 -> "Okay"
