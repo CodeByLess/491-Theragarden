@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.annotation)
     implementation(libs.firebase.storage)
+    implementation(libs.androidx.legacy.support.v4)
+    implementation(libs.androidx.fragment.ktx)
     implementation("com.airbnb.android:lottie:6.4.0")
 
 
