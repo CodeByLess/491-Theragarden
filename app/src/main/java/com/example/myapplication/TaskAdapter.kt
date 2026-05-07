@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 class TaskAdapter(
     private val tasks: MutableList<Task>,
-    private val onCheckedChange: (Task) -> Unit
+    private val onCheckedChange: (Task) -> Unit,
+    private val onDelete: (Task) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     inner class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -32,6 +33,15 @@ class TaskAdapter(
 
         holder.checkBox.setOnCheckedChangeListener { _, _ ->
             onCheckedChange(task)
+        }
+
+        // Added by Lesley:
+        // Allows the user to delete a task by long pressing anywhere
+        // on the task row. The actual delete action is handled in
+        // HomeFragment so a confirmation dialog can appear first.
+        holder.itemView.setOnLongClickListener {
+            onDelete(task)
+            true
         }
     }
 
