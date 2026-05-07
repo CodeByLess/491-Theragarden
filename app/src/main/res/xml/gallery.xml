@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    file_paths.xml
+
+    Defines file access paths for FileProvider.
+    This allows the app to securely share image files
+    with the camera application without exposing raw file paths.
+-->
+
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+        Grants access to app-specific external files directory.
+        The path corresponds to:
+        /Android/data/<package-name>/files/Pictures/TheragardenGallery/
+
+        This folder stores captured gratitude photos.
+    -->
+    <external-files-path
+        name="theragarden_gallery"
+        path="Pictures/TheragardenGallery/" />
+
+</paths>

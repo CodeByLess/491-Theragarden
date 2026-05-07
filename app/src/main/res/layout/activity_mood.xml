@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- UI for mood choice activity -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -38,6 +38,7 @@
             android:textSize="30sp"
             android:background="@drawable/rounded_corners" />
 
+        <!-- Date that changes daily -->
         <TextView
             android:id="@+id/date"
             android:layout_width="wrap_content"
@@ -49,6 +50,7 @@
             android:textSize="20sp"
             android:background="@drawable/rounded_corners" />
 
+        <!-- happy button -->
         <ImageButton
             android:id="@+id/happyButton"
             android:layout_width="150dp"
@@ -62,6 +64,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/happy" />
 
+        <!-- okay button -->
         <ImageButton
             android:id="@+id/okayButton"
             android:layout_width="150dp"
@@ -74,6 +77,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/okaybutton" />
 
+        <!-- mad button -->
         <ImageButton
             android:id="@+id/madButton"
             android:layout_width="150dp"
@@ -87,6 +91,7 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/madbutton" />
 
+        <!-- Submit button -->
         <Button
             android:id="@+id/SubmitMood"
             android:layout_width="wrap_content"
