@@ -22,6 +22,7 @@ import com.example.myapplication.Seeds
 import com.example.myapplication.Sleep
 import com.example.myapplication.Stretches
 import com.example.myapplication.databinding.FragmentDashboardBinding
+import com.example.myapplication.PuzzleActivity
 
 class DashboardFragment : Fragment() {
 
@@ -97,6 +98,10 @@ class DashboardFragment : Fragment() {
         }
         binding.btnJournal.setOnClickListener {
             val intent = Intent(requireContext(), Journal::class.java)
+            startActivity(intent)
+        }
+        binding.btnPuzzle.setOnClickListener {
+            val intent = Intent(requireContext(), PuzzleActivity::class.java)
             startActivity(intent)
         }
 

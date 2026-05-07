@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  activity_stretch4.xml
+  - Layout for the Stretch4 Activity (final guided stretch screen)
+  - Root ConstraintLayout provides flexible positioning for:
+      * Back button (top-left)
+      * Central content card (greenBox)
+      * Submit button anchored below the card
+  - Root has id="main" so the Activity can apply window inset padding
+    (prevents content from being hidden under system bars).
+-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,6 +18,8 @@
     android:background="@color/dark_gray_brown"
     tools:context=".Stretch4">
 
+    <!-- BACK BUTTON:
+         - Finishes the Activity and returns to the previous screen -->
     <Button
         android:id="@+id/btnBack"
         android:layout_width="wrap_content"
@@ -17,6 +29,9 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- SUBMIT BUTTON:
+         - Logs completion of this stretch (increments completedGoals in Firestore in code)
+         - Placed below the content card and aligned to the card's right edge -->
     <Button
         android:id="@+id/btnSubmit"
         android:layout_width="wrap_content"
@@ -28,6 +43,9 @@
         app:layout_constraintEnd_toEndOf="@id/greenBox"
         app:layout_constraintTop_toBottomOf="@id/greenBox" />
 
+    <!-- greenBox:
+         - Main content container (MaterialCardView) for the stretch instructions
+         - Uses percent sizing for responsive scaling across devices -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/greenBox"
         android:layout_width="0dp"
@@ -43,13 +61,16 @@
         app:layout_constraintWidth_percent="0.90"
         app:layout_constraintHeight_percent="0.70">
 
+        <!-- Card content:
+             - Vertical layout for title + instructions
+             - Padding ensures spacing from the card edges -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="20dp">
 
-
+            <!-- Title for the final stretch -->
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
@@ -61,7 +82,7 @@
                 android:gravity="center"
                 android:layout_marginBottom="12dp"/>
 
-
+            <!-- Instructions body:-->
             <TextView
                 android:id="@+id/tvInstructions"
                 android:layout_width="match_parent"
@@ -69,7 +90,7 @@
                 android:lineSpacingExtra="4dp"
                 android:text="• Raise your right arm overhead and gently lean to the left.
                 \n• Feel the stretch along your ribs and side.
-                \n• Hold for 10 seconds, thenswitch sides
+                \n• Hold for 10 seconds, then switch sides
                 \n• Inhale tall, exhale as you lean.
                 \n\n\n\n\n                         Press submit if you are done"
                 android:textColor="@android:color/white"

@@ -1,65 +1,345 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#2b1408"
     tools:context=".ui.home.HomeFragment">
 
-    <Button
-        android:id="@+id/btnProfile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="@string/profile"
+    <!-- Added by Lesley Del Cid:
+         TOP ROOM SCENE CONTAINER:
+         This light section recreates the room/wall area from the prototype.
+         It holds the profile button, plant image, progress meter,
+         and placeholder square on the right side. -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topSceneContainer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#f5efe9"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/floorStrip"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.48">
 
+        <Button
+            android:id="@+id/btnProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="14dp"
+            android:text="@string/profile"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Added by Lesley Del Cid:
+             TIME BADGE:
+             Displays GM, GA, GE, or GN depending on the current time. -->
+        <TextView
+            android:id="@+id/tvTimeBadge"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_margin="16dp"
+            android:background="@android:drawable/btn_default"
+            android:backgroundTint="#6A4FBF"
+            android:elevation="4dp"
+            android:gravity="center"
+            android:text="GM"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!--Displays Bloom Points (reward currency from tasks/blooms) -paula -->
+        <TextView
+            android:id="@+id/txtBloomPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="16dp"
+            android:text="Bloom Points: 0"
+            android:textColor="#333333"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnProfile" />
+
+        <!-- Added by Lesley Del Cid:
+             VERTICAL GROWTH METER BACKGROUND:
+             This is the full background bar shown on the left side of the room.
+             A separate fill view is placed inside it to simulate plant growth
+             vertically from bottom to top. -->
+        <FrameLayout
+            android:id="@+id/plantMeterContainer"
+            android:layout_width="14dp"
+            android:layout_height="150dp"
+            android:layout_marginStart="18dp"
+            android:layout_marginBottom="24dp"
+            android:background="#d7d0c9"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <!-- Added by Lesley Del Cid:
+                 VERTICAL GROWTH METER FILL:
+                 This green fill is what visually represents progress.
+                 Its height is updated in HomeFragment based on
+                 the plantProgress value from Firestore. -->
+            <View
+                android:id="@+id/plantMeterFill"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_gravity="bottom"
+                android:background="#53b52f" />
+
+            <!-- Added by Lesley Del Cid:
+                 VERTICAL GROWTH METER TOP CAP:
+                 This brown top section matches the prototype's top meter block. -->
+            <View
+                android:id="@+id/plantMeterTopCap"
+                android:layout_width="match_parent"
+                android:layout_height="14dp"
+                android:layout_gravity="top"
+                android:background="#6b2d12" />
+        </FrameLayout>
+
+        <!-- Added by Lesley Del Cid:
+             CURRENT PLANT DISPLAY CONTAINER:
+             This fixed-size container keeps all plant stages displayed within
+             the same visual area so dirt, sprout, and bloom stay consistent.
+             It is anchored near the bottom so the plant appears to sit on the floor. -->
+        <FrameLayout
+            android:id="@+id/plantImageContainer"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_marginStart="34dp"
+            android:layout_marginBottom="6dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/plantMeterContainer">
+
+            <!-- Added by Lesley Del Cid:
+                 CURRENT PLANT IMAGE DISPLAY:
+                 Shows dirt/sprout universally, and bloom depends on selected seed.
+                 The fixed container keeps the image height consistent across stages. -->
+            <ImageView
+                android:id="@+id/imgPlantStage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Plant stage image"
+                android:scaleType="fitCenter"
+                android:src="@drawable/dirt" />
+        </FrameLayout>
+
+        <!-- Added by Lesley Del Cid:
+             RIGHT SIDE PLACEHOLDER SQUARE:
+             This blue square is a placeholder area for another feature/image
+             that will be added later by a teammate. -->
+        <View
+            android:id="@+id/rightPlaceholderSquare"
+            android:layout_width="118dp"
+            android:layout_height="118dp"
+            android:layout_marginTop="28dp"
+            android:layout_marginEnd="26dp"
+            android:background="#4c79c9"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Added by Lesley Del Cid:
+         FLOOR STRIP:
+         This colored strip recreates the floor section from the prototype and
+         visually separates the top room scene from the goals area below. -->
+    <View
+        android:id="@+id/floorStrip"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:background="#9f684d"
+        app:layout_constraintTop_toBottomOf="@id/topSceneContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Added by Lesley Del Cid:
+         DAILY GOALS PANEL:
+         This rounded panel groups the task input and task list
+         into one section similar to the prototype's Daily Goals card. -->
+    <LinearLayout
+        android:id="@+id/dailyGoalsPanel"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="26dp"
+        android:layout_marginBottom="18dp"
+        android:background="@drawable/rounded_container"
+        android:orientation="vertical"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="10dp"
+        app:layout_constraintTop_toBottomOf="@id/floorStrip"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Added by Lesley Del Cid:
+             DAILY GOALS TITLE:
+             Title label for the task list section. -->
+        <TextView
+            android:id="@+id/txtDailyGoalsTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Daily Goals"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+
+        <!-- Added by Lesley Del Cid: CHOOSE NEW SEED BUTTON:
+             Only becomes visible when plantCompleted == true.
+             Allows the user to start a new plant cycle.
+             Initially hidden (visibility="gone") until Firestore listener updates it. -->
+        <Button
+            android:id="@+id/btnChooseNewSeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:text="Choose New Seed"
+            android:visibility="gone" />
+
+        <!-- Added by Lesley Del Cid:
+             TASK INPUT ROW:
+             Holds the task entry field and add button on one row. -->
+        <LinearLayout
+            android:id="@+id/taskInputRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/etTask"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:background="@android:color/white"
+                android:hint="@string/new_task"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp" />
+
+            <Button
+                android:id="@+id/btnAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/add" />
+        </LinearLayout>
+
+        <!--Opens Spin Wheel feature to unlock rare plants -paula -->
+        <Button
+            android:id="@+id/btnSpinWheel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#FF9800"
+            android:text="Spin Wheel"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+
+        <!-- Opens shop to purchase plants using Bloom Points -paula -->
+        <Button
+            android:id="@+id/btnOpenShop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#4CAF50"
+            android:text="Seed Shop"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/taskRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1"
+            android:overScrollMode="never" />
+
+    </LinearLayout>
+
+    <!-- Added by Lesley Del Cid:
+         HIDDEN DEBUG TEXT:
+         These text views are kept in the file so existing Kotlin IDs do not break,
+         but they are hidden from the UI because they were only used for testing. -->
     <TextView
         android:id="@+id/text_home"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnProfile" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <EditText
-        android:id="@+id/etTask"
-        android:layout_width="307dp"
-        android:layout_height="67dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="16dp"
-        android:hint="@string/new_task"
-        app:layout_constraintEnd_toStartOf="@id/btnAdd"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/text_home"
-        />
-
-    <Button
-        android:id="@+id/btnAdd"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/add"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintStart_toEndOf="@id/etTask"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/etTask"
-        app:layout_constraintBottom_toBottomOf="@id/etTask"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/taskRecyclerView"
+    <TextView
+        android:id="@+id/txtCompletedGoals"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/etTask"
+        android:layout_height="wrap_content"
+        android:text="Goals completed: 0"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <TextView
+        android:id="@+id/txtCompletedPlants"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Plants completed: 0"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <TextView
+        android:id="@+id/txtCurrentPlant"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Current plant: None"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/txtPlantStage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Stage: dirt"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Added by Lesley Del Cid:
+         HIDDEN ORIGINAL HORIZONTAL PROGRESS BAR:
+         This is kept hidden so existing Kotlin references do not crash right away.
+         After HomeFragment is updated to use the new vertical meter views,
+         this old bar can be deleted. -->
+    <ProgressBar
+        android:id="@+id/plantProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="0"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
