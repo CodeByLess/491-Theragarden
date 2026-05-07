@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!-- Added by Lesley Del Cid:
      Stats page layout for Theragarden app.
      Includes streaks, custom calendar, selected-day details, weekly/monthly summaries,
-     habit streak tracking, and plant image previews. -->
+     habit streak tracking, plant image previews, and mood statistics chart. -->
+
+<!-- Scrollable container to ensure content fits on all screen sizes -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/dark_gray_brown">
+    android:background="@color/dark_gray_brown"
+    android:padding="16dp">
 
+    <!-- Main vertical layout for stacking UI elements -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp"
         android:paddingBottom="220dp">
 
         <!-- Added by Lesley Del Cid:
@@ -26,7 +30,115 @@
             android:textAlignment="center"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_marginBottom="18dp" />
+
+        <!-- Page title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mood Statistics"
+            android:textColor="@color/white"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Line chart displaying mood trends over time -->
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/moodChart"
+            android:layout_width="match_parent"
+            android:layout_height="260dp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Container for mood statistics -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/gray_green"
+            android:padding="14dp"
+            android:layout_marginBottom="16dp">
+
+            <!-- Latest mood entry -->
+            <TextView
+                android:id="@+id/tvLatestMood"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Latest: --"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Average mood value -->
+            <TextView
+                android:id="@+id/tvAverageMood"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Average: --"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Highest recorded mood -->
+            <TextView
+                android:id="@+id/tvHighestMood"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Highest: --"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Lowest recorded mood -->
+            <TextView
+                android:id="@+id/tvLowestMood"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Lowest: --"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Total number of mood entries -->
+            <TextView
+                android:id="@+id/tvTotalEntries"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Entries: 0"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <!-- Message shown based on user mood trends -->
+        <TextView
+            android:id="@+id/tvSupportMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Button to navigate to self-care tools if needed -->
+        <Button
+            android:id="@+id/btnSelfCareHub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Go to Self-Care Hub"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/gray_green"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Status text for loading or error messages -->
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:layout_marginBottom="18dp" />
 
         <!-- Added by Lesley Del Cid:
              Displays the user's overall day streak. -->
@@ -310,4 +422,5 @@
             android:layout_height="180dp" />
 
     </LinearLayout>
+
 </ScrollView>

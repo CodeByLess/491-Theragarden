@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/rounded_container">
+
+    <!-- Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Here are your tasks for today ✨"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Subtitle -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Select the tasks you would like to add to your list"
+        android:textSize="14sp"
+        android:textColor="#888888"
+        android:layout_marginBottom="20dp"/>
+
+    <!-- Task list with checkboxes -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvSuggestedTasks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false"/>
+
+    <!-- Add Selected Tasks Button -->
+    <Button
+        android:id="@+id/btnAddTasks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Selected Tasks"
+        android:backgroundTint="#4CAF50"
+        android:layout_marginTop="20dp"/>
+
+    <!-- Retake Quiz Button -->
+    <Button
+        android:id="@+id/btnRetakeQuiz"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Retake Quiz"
+        android:layout_marginTop="4dp"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+    <!-- Exit Button -->
+    <Button
+        android:id="@+id/btnExit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Exit"
+        android:layout_marginTop="4dp"
+        style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+</LinearLayout>

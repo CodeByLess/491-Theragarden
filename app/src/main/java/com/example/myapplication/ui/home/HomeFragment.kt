@@ -1,23 +1,26 @@
 package com.example.myapplication.ui.home
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.core.graphics.toColorInt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.appcompat.app.AlertDialog
 import com.example.myapplication.Profile
+import com.example.myapplication.R
 import com.example.myapplication.TaskAdapter
 import com.example.myapplication.TaskRepository
 import com.example.myapplication.databinding.FragmentHomeBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import com.example.myapplication.R
+import java.util.Calendar
 
 /*
   HomeFragment
@@ -33,6 +36,7 @@ import com.example.myapplication.R
 */
 class HomeFragment : Fragment() {
 
+    // View binding reference for accessing UI elements
     private var _binding: FragmentHomeBinding? = null
 
     /*Added by Lesley Del Cid:
@@ -47,15 +51,18 @@ class HomeFragment : Fragment() {
 
     private val binding get() = _binding!!
 
+    // Inflate the layout and initialize binding
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
         val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+            ViewModelProvider(this)[HomeViewModel::class.java]
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+
         val root: View = binding.root
 
         val textView: TextView = binding.textHome
@@ -85,8 +92,11 @@ class HomeFragment : Fragment() {
         }
     }
 
+    // Main UI setup and logic
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val rewardRepository = RewardRepository()
 
         // Profile button stays the same
         binding.btnProfile.setOnClickListener {
@@ -130,6 +140,7 @@ class HomeFragment : Fragment() {
                 val plantProgress = snapshot?.getLong("plantProgress")?.toInt() ?: 0
                 binding.plantProgressBar.progress = plantProgress
                 updateVerticalPlantMeter(plantProgress)
+
                 val plantCompleted = snapshot?.getBoolean("plantCompleted") ?: false
                 val plantStage = snapshot?.getString("plantStage") ?: "dirt"
 
@@ -151,7 +162,9 @@ class HomeFragment : Fragment() {
                 */
                 val imageRes = when (plantStage.lowercase()) {
                     "dirt" -> R.drawable.dirt
+
                     "sprout" -> R.drawable.sprout
+
                     "bloom" -> {
                         when (currentSeedId) {
                             "Sunflower Seed" -> R.drawable.sunflower
@@ -163,6 +176,7 @@ class HomeFragment : Fragment() {
                             else -> R.drawable.sprout
                         }
                     }
+
                     else -> R.drawable.dirt
                 }
 
@@ -188,7 +202,8 @@ class HomeFragment : Fragment() {
                   Update button text depending on state
                 */
                 binding.btnChooseNewSeed.text =
-                    if (plantCompleted) "Choose New Seed" else "Pick a New Seed"
+                    if (plantCompleted) "Choose New Seed"
+                    else "Pick a New Seed"
             }
         }
 
@@ -198,7 +213,9 @@ class HomeFragment : Fragment() {
           - Milestone popups are handled globally in MainActivity.
         */
         binding.btnChooseNewSeed.setOnClickListener {
-            val intent = Intent(requireContext(), com.example.myapplication.Seeds::class.java)
+            val intent =
+                Intent(requireContext(), com.example.myapplication.Seeds::class.java)
+
             startActivity(intent)
         }
 
@@ -211,9 +228,11 @@ class HomeFragment : Fragment() {
         // Long pressing a task opens a confirmation dialog before deletion.
         val adapter = TaskAdapter(
             mutableListOf(),
+
             { task ->
                 repository.toggleTask(task)
             },
+
             { task ->
                 // Added by Lesley:
                 // Confirmation dialog prevents accidental deletion of tasks.
@@ -230,26 +249,107 @@ class HomeFragment : Fragment() {
 
         binding.taskRecyclerView.layoutManager =
             LinearLayoutManager(requireContext())
+
         binding.taskRecyclerView.adapter = adapter
 
+        // Listen for task updates and refresh UI
         repository.listenToTasks { tasks ->
             adapter.updateTasks(tasks)
         }
 
         binding.btnAdd.setOnClickListener {
             val taskText = binding.etTask.text.toString().trim()
+
             if (taskText.isNotEmpty()) {
                 repository.addTask(taskText)
                 binding.etTask.text.clear()
             }
         }
+
+        // Open spin wheel activity
+        binding.btnSpinWheel.setOnClickListener {
+            val intent =
+                Intent(requireContext(), SpinWheelActivity::class.java)
+
+            startActivity(intent)
+        }
+
+        // Open shop dialog
+        binding.btnOpenShop.setOnClickListener {
+            showShopDialog(rewardRepository)
+        }
     }
 
+    // Update badge (GM, GA, GE, GN) based on current time
+    override fun onResume() {
+        super.onResume()
+        setTimeBadge()
+    }
+
+    private fun setTimeBadge() {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+
+        val (badgeText, badgeColor) = when (hour) {
+            in 5..11 -> "GM" to "#6A4FBF"   // Morning
+            in 12..16 -> "GA" to "#4CAF50" // Afternoon
+            in 17..20 -> "GE" to "#FF9800" // Evening
+            else -> "GN" to "#3F51B5"      // Night
+        }
+
+        binding.tvTimeBadge.text = badgeText
+
+        binding.tvTimeBadge.backgroundTintList =
+            ColorStateList.valueOf(badgeColor.toColorInt())
+    }
+
+    // Generic popup for rewards and shop messages
+    private fun showRewardPopup(title: String, message: String) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show()
+    }
+
+    // Display shop items and handle purchases
+    private fun showShopDialog(rewardRepository: RewardRepository) {
+
+        val shopItems =
+            rewardRepository.getShopSeeds().toList()
+
+        val itemLabels =
+            shopItems.map {
+                "${it.first} - ${it.second} pts"
+            }.toTypedArray()
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Seed Shop")
+
+            .setItems(itemLabels) { _, which ->
+
+                val selectedSeed =
+                    shopItems[which].first
+
+                rewardRepository.buyShopSeed(selectedSeed) { success, message ->
+
+                    showRewardPopup(
+                        if (success) "Shop Purchase" else "Shop",
+                        message
+                    )
+                }
+            }
+
+            .setNegativeButton("Close", null)
+            .show()
+    }
+
+    // Prevent memory leaks by clearing binding
     override fun onDestroyView() {
         super.onDestroyView()
 
         goalsListener?.remove()
         goalsListener = null
+
         _binding = null
     }
 }

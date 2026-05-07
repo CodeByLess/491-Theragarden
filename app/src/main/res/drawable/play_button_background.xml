@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Background for play buttons in music feature -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
 
     <solid android:color="#5DA3E8" />

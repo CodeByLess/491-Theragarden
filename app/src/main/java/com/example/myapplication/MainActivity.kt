@@ -48,6 +48,8 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         handleOpenTab(intent, navView)
+
+        QuizManager(this).checkAndShowQuiz()
     }
 
     /*Added by Lesley Del Cid:
