@@ -1,27 +1,85 @@
 package com.example.myapplication
 
+import android.content.ContentValues
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
+import android.provider.MediaStore
+import android.view.View
 import android.widget.Button
-import androidx.activity.enableEdgeToEdge
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class Doodle : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_doodle)
 
-        val backButton = findViewById<Button>(R.id.btnBack)
-        backButton.setOnClickListener {
-            finish() // return to Home
+        // buttons
+        val btnBack = findViewById<Button>(R.id.btnBack)
+        val btnSave = findViewById<Button>(R.id.btnSave)
+        val btnLibrary = findViewById<Button>(R.id.btnLibrary)
+        val btnClear = findViewById<Button>(R.id.btnClear)
+        val btnUndo = findViewById<Button>(R.id.btnUndo)
+
+        // drawing view
+        val drawingView = findViewById<DrawingView>(R.id.drawingView)
+
+        // color options
+        val colorBlack = findViewById<View>(R.id.colorBlack)
+        val colorRed = findViewById<View>(R.id.colorRed)
+        val colorBlue = findViewById<View>(R.id.colorBlue)
+        val colorGreen = findViewById<View>(R.id.colorGreen)
+        val colorBrown = findViewById<View>(R.id.colorBrown)
+        val colorYellow = findViewById<View>(R.id.colorYellow)
+
+        btnBack.setOnClickListener {
+            finish() // go back
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        btnSave.setOnClickListener {
+            val bitmap = drawingView.getBitmap()
+            saveToGallery(bitmap) // save drawing
+        }
+
+        btnLibrary.setOnClickListener {
+            startActivity(Intent(this, LibraryDoodle::class.java)) // open library
+        }
+
+        btnClear.setOnClickListener {
+            drawingView.clearCanvas() // clear drawing
+        }
+
+        btnUndo.setOnClickListener {
+            drawingView.undo() // undo last line
+        }
+
+        // change colors
+        colorBlack.setOnClickListener { drawingView.setColor(Color.BLACK) }
+        colorRed.setOnClickListener { drawingView.setColor(Color.RED) }
+        colorBlue.setOnClickListener { drawingView.setColor(Color.BLUE) }
+        colorGreen.setOnClickListener { drawingView.setColor(Color.GREEN) }
+        colorBrown.setOnClickListener { drawingView.setColor(Color.parseColor("#795548")) }
+        colorYellow.setOnClickListener { drawingView.setColor(Color.parseColor("#FFC107")) }
+    }
+
+    // save image to phone
+    private fun saveToGallery(bitmap: Bitmap) {
+        val values = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "doodle_${System.currentTimeMillis()}.png")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Doodles")
+        }
+
+        val uri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+
+        uri?.let {
+            contentResolver.openOutputStream(it)?.use { stream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                Toast.makeText(this, "Saved to Gallery!", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
