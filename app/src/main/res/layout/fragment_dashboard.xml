@@ -156,6 +156,18 @@
         app:layout_constraintStart_toEndOf="@id/btnJournal"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <Button
+        android:id="@+id/btnPuzzle"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Puzzle"
+        app:layout_constraintTop_toBottomOf="@id/btnJournal"
+        app:layout_constraintStart_toEndOf="@id/btnQuote"
+        app:layout_constraintEnd_toStartOf="@id/btnMoreSoon" />
+
 
     <TextView
         android:id="@+id/text_dashboard"
