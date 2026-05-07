@@ -1,4 +1,5 @@
 <resources>
+    <!-- strings text below -->
     <string name="app_name">My Application</string>
 
     <string name="title_home">Home</string>
@@ -65,4 +66,15 @@
     <string name="press_submit_if_you_are_done_to_update_plant_progress">Press submit if you are done to update plant progress</string>
     <string name="rain">Rain</string>
     <string name="play">Play</string>
+
+    <string name="about"> Theragarden is a mobile wellness app designed to help users manage stress, track their emotions, and cultivate healthier habits through gamified plant growth.
+    Every action you take - logging your mood, completing self-care exercises, or writing a journal entry - helps your virtual plant growth,
+    symbolizing your personal progress and consistency.\n \nOur mission is to make mental health care more accessible, private, and rewarding.
+        By combining therapy-inspired techniques, mindful journaling, and motivational visuals, Theragarden turns emotional awareness into a creative, uplifting experience.</string>
+    <string name="tutorialText">Welcome to Theragarden \n Track your moods, care for yourself, and watch your virtual plants bloom as you grow too
+    \n\nYour Garden\n When your first plant fully blooms, you\'ll unlock your virtual garden to showcase your progress
+    \n\nMood Check-In\n Start or end your dat with a quick mood check. Pick an emoji that matches how you feel and add a short note. Track your emotions over time to see your patterns
+    and progress.\n\nSelf-Care Hub\nAccess relaxing and creative activities anytime.\n\nStats\nView your wellness journey in one place. Track mood, sleep, hydration, and activity streaks.\n\nRewards and Customization\n
+    Earn rewards as you complete activities! Unlock seed packs, grow new plants, and decorate your garden with special themes \n\nAbout Page\n Access professional mental-health resources and crisis
+    hotline anytime. All links are confidential and always available.</string>
 </resources>
