@@ -1,52 +1,70 @@
 package com.example.myapplication
 
-// Android UI and RecyclerView imports
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
-
-// File handling import
 import java.io.File
 
-/*
- * GalleryAdapter
- *
- * RecyclerView adapter responsible for displaying
- * image files inside the GalleryActivity.
- * Each image is displayed using item_image layout.
- */
-class GalleryAdapter(private val images: List<File>) :
-    RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
+class GalleryAdapter(
+    private var images: List<File>,
+    private val isFavorite: (File) -> Boolean,
+    private val onFavoriteToggle: (File) -> Unit,
+    private val onDeleteRequested: (File) -> Unit,
+    private val onImageSelected: (File) -> Unit
+) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
 
-    /*
-     * ViewHolder class holds reference to ImageView
-     * for each grid item in the RecyclerView.
-     */
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imageView: ImageView = view.findViewById(R.id.imageItem)
+        val favoriteButton: ImageButton = view.findViewById(R.id.btnFavorite)
     }
 
-    /*
-     * Called when RecyclerView needs a new ViewHolder.
-     * Inflates item_image layout.
-     */
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_image, parent, false)
         return ViewHolder(view)
     }
 
-    // Returns total number of images
     override fun getItemCount(): Int = images.size
 
-    /*
-     * Binds image file to ImageView.
-     * Converts File into URI for display.
-     */
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.imageView.setImageURI(Uri.fromFile(images[position]))
+        val file = images[position]
+
+        holder.imageView.setImageURI(Uri.fromFile(file))
+
+        val favoriteIcon = if (isFavorite(file)) {
+            android.R.drawable.btn_star_big_on
+        } else {
+            android.R.drawable.btn_star_big_off
+        }
+        holder.favoriteButton.setImageResource(favoriteIcon)
+
+        holder.favoriteButton.setOnClickListener {
+            onFavoriteToggle(file)
+
+            val updatedIcon = if (isFavorite(file)) {
+                android.R.drawable.btn_star_big_on
+            } else {
+                android.R.drawable.btn_star_big_off
+            }
+            holder.favoriteButton.setImageResource(updatedIcon)
+        }
+
+        holder.itemView.setOnClickListener {
+            onImageSelected(file)
+        }
+
+        holder.itemView.setOnLongClickListener {
+            onDeleteRequested(file)
+            true
+        }
+    }
+
+    fun updateFiles(newImages: List<File>) {
+        images = newImages
+        notifyDataSetChanged()
     }
 }

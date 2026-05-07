@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!--
-    item_image.xml
-
-    Layout for a single image item inside the Gallery RecyclerView.
-    Used by GalleryAdapter to display each saved photo.
--->
-
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/imageItem"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="120dp"
-    android:layout_margin="4dp"
-    android:scaleType="centerCrop"
-    android:background="#6E8F4F" />
+    android:layout_margin="4dp">
 
-    <!--
-        scaleType="centerCrop" ensures the image fills the view
-        while maintaining aspect ratio.
+    <ImageView
+        android:id="@+id/imageItem"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:contentDescription="Gallery image" />
 
-        Background color acts as a placeholder before image loads.
-    -->
+    <ImageButton
+        android:id="@+id/btnFavorite"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="6dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="Favorite image"
+        android:src="@android:drawable/btn_star_big_off" />
+
+</FrameLayout>

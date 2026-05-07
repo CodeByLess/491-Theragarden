@@ -33,7 +33,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/gallery" />
         </provider>
-
+        <activity android:name=".ui.home.SpinWheelActivity" />
         <activity
             android:name=".Stretch4"
             android:exported="false" />
@@ -75,6 +75,11 @@
         <activity
             android:name=".Doodle"
             android:exported="false" />
+        <activity
+            android:name=".PuzzleActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LibraryDoodle" />
         <activity
             android:name=".Music"
             android:exported="false" />

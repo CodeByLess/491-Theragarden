@@ -39,7 +39,6 @@ class TaskRepository {
         return sdf.format(Date())
     }
 
-
     /**
      * Adds a completed task to today's daily log.
      *
@@ -116,8 +115,6 @@ class TaskRepository {
         }
     }
 
-
-
     /**
      * Listens for real-time updates to the user's task list.
      * Used by the Home screen to display tasks.
@@ -182,14 +179,24 @@ class TaskRepository {
         )
     }
 
+    // NEW (3.1) – Count completed tasks
+    fun listenToCompletedTaskCount(onResult: (Int) -> Unit) {
+        taskRef().addSnapshotListener { snapshot, _ ->
+
+            val completedCount = snapshot?.documents?.count { document ->
+                document.getBoolean("completed") == true
+            } ?: 0
+
+            onResult(completedCount)
+        }
+    }
+
     /**
      * Deletes a task permanently.
      */
     fun deleteTask(task: Task) {
         taskRef().document(task.id).delete()
     }
-
-
 
     /**
      * Listens for changes in dailyLogs and calculates
