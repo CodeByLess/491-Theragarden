@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#2b1408"
@@ -14,16 +12,27 @@
          This light section recreates the room/wall area from the prototype.
          It holds the profile button, plant image, progress meter,
          and placeholder square on the right side. -->
+
+    <!-- Added by Lesley Del Cid:
+         FLOOR STRIP:
+         This colored strip recreates the floor section from the prototype and
+         visually separates the top room scene from the goals area below. -->
+
+    <!-- Added by Lesley Del Cid:
+         DAILY GOALS PANEL:
+         This rounded panel groups the task input and task list
+         into one section similar to the prototype's Daily Goals card. -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/topSceneContainer"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#f5efe9"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/floorStrip"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.48">
+        app:layout_constraintHeight_percent="0.48"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <Button
             android:id="@+id/btnProfile"
@@ -35,38 +44,29 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <!-- Added by Lesley Del Cid:
-             TIME BADGE:
-             Displays GM, GA, GE, or GN depending on the current time. -->
-        <TextView
-            android:id="@+id/tvTimeBadge"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_margin="16dp"
-            android:background="@android:drawable/btn_default"
-            android:backgroundTint="#6A4FBF"
-            android:elevation="4dp"
-            android:gravity="center"
-            android:text="GM"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!--Displays Bloom Points (reward currency from tasks/blooms) -paula -->
         <TextView
             android:id="@+id/txtBloomPoints"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_marginStart="16dp"
-            android:text="Bloom Points: 0"
-            android:textColor="#333333"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="68dp"
+            android:text="🌸 Bloom Points: 0"
+            android:textColor="#6F4DBF"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btnProfile" />
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btnOpenShop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="14dp"
+            android:layout_marginTop="8dp"
+            android:text="Seed Shop"
+            android:textSize="12sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtBloomPoints" />
 
         <!-- Added by Lesley Del Cid:
              VERTICAL GROWTH METER BACKGROUND:
@@ -137,35 +137,33 @@
              RIGHT SIDE PLACEHOLDER SQUARE:
              This blue square is a placeholder area for another feature/image
              that will be added later by a teammate. -->
-        <View
-            android:id="@+id/rightPlaceholderSquare"
+        <TextView
+            android:id="@+id/txtGreetingBadge"
             android:layout_width="118dp"
             android:layout_height="118dp"
             android:layout_marginTop="28dp"
             android:layout_marginEnd="26dp"
             android:background="#4c79c9"
+            android:gravity="center"
+            android:text="GM"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
+            android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Added by Lesley Del Cid:
-         FLOOR STRIP:
-         This colored strip recreates the floor section from the prototype and
-         visually separates the top room scene from the goals area below. -->
     <View
         android:id="@+id/floorStrip"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:background="#9f684d"
-        app:layout_constraintTop_toBottomOf="@id/topSceneContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/topSceneContainer" />
 
-    <!-- Added by Lesley Del Cid:
-         DAILY GOALS PANEL:
-         This rounded panel groups the task input and task list
-         into one section similar to the prototype's Daily Goals card. -->
     <LinearLayout
         android:id="@+id/dailyGoalsPanel"
         android:layout_width="0dp"
@@ -238,29 +236,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/add" />
+
         </LinearLayout>
 
-        <!--Opens Spin Wheel feature to unlock rare plants -paula -->
         <Button
             android:id="@+id/btnSpinWheel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:backgroundTint="#FF9800"
-            android:text="Spin Wheel"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white" />
-
-        <!-- Opens shop to purchase plants using Bloom Points -paula -->
-        <Button
-            android:id="@+id/btnOpenShop"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:backgroundTint="#4CAF50"
-            android:text="Seed Shop"
-            android:textAllCaps="false"
-            android:textColor="@android:color/white" />
+            android:text="Spin the Wheel" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/taskRecyclerView"

@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Added by Lesley Del Cid:
-     Pink dot for plants grown -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#F48FB1"/>
-    <corners android:radius="3dp"/>
-</shape>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+</selector>
