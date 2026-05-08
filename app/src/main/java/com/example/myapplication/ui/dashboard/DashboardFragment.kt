@@ -18,10 +18,14 @@ import com.example.myapplication.Mood
 import com.example.myapplication.Music
 import com.example.myapplication.Photo
 import com.example.myapplication.Quote
+import com.example.myapplication.R
 import com.example.myapplication.Seeds
 import com.example.myapplication.Sleep
 import com.example.myapplication.Stretches
 import com.example.myapplication.databinding.FragmentDashboardBinding
+import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class DashboardFragment : Fragment() {
 
@@ -50,6 +54,8 @@ class DashboardFragment : Fragment() {
     }
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        checkIncompleteTasksAndNotify()  // ADD THIS CALL
 
         binding.btnLinks.setOnClickListener {
             val intent = Intent(requireContext(), Links::class.java)
@@ -99,9 +105,33 @@ class DashboardFragment : Fragment() {
             val intent = Intent(requireContext(), Journal::class.java)
             startActivity(intent)
         }
+    }
 
+    private fun checkIncompleteTasksAndNotify() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .collection("tasks")
+            .whereEqualTo("completed", false)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.isEmpty) return@addOnSuccessListener
 
+                val count = snapshot.size()
+                val taskWord = if (count == 1) "task" else "tasks"
+
+                Snackbar.make(
+                    binding.root,
+                    "You have $count incomplete $taskWord today 📋",
+                    Snackbar.LENGTH_INDEFINITE
+                ).setAction("Go to Tasks") {
+                    requireActivity().findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(
+                        R.id.nav_view
+                    )?.selectedItemId = R.id.navigation_home
+                }.show()
+            }
     }
 
     override fun onDestroyView() {

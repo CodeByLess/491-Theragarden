@@ -40,4 +40,17 @@ class TaskRepository {
             )
         )
     }
+
+    fun deleteTask(taskId: String) {
+        taskRef().document(taskId).delete()
+    }
+
+    fun deleteAllIncompleteTasks(onComplete: () -> Unit) {
+        taskRef().whereEqualTo("completed", false).get()
+            .addOnSuccessListener { snapshot ->
+                val batch = db.batch()
+                snapshot.documents.forEach { batch.delete(it.reference) }
+                batch.commit().addOnSuccessListener { onComplete() }
+            }
+    }
 }
