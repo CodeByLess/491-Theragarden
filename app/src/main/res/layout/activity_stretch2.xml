@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  activity_stretch2.xml
+  - Layout for the Stretch2 Activity (second guided stretch screen)
+  - Root is a ConstraintLayout so we can position:
+      * Back button at top-left
+      * A centered content card (greenBox)
+      * Next/Submit buttons anchored below the card
+  - The Activity applies window inset padding to the root view (id="main")
+    to avoid overlapping with status/navigation bars.
+-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -8,6 +18,8 @@
     android:background="@color/dark_gray_brown"
     tools:context=".Stretch2">
 
+    <!-- BACK BUTTON:
+         - Finishes this Activity and returns to the previous stretch screen -->
     <Button
         android:id="@+id/btnBack"
         android:layout_width="wrap_content"
@@ -17,6 +29,9 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <!-- NEXT BUTTON:
+         - Advances to the next guided stretch screen (Stretch3)
+         - Positioned just below the content card and aligned to the card's right edge -->
     <Button
         android:id="@+id/btnNext"
         android:layout_width="wrap_content"
@@ -25,6 +40,10 @@
         android:layout_margin="16dp"
         app:layout_constraintTop_toBottomOf="@id/greenBox"
         app:layout_constraintEnd_toEndOf="@id/greenBox" />
+
+    <!-- SUBMIT BUTTON:
+         - Records completion (increments completedGoals in Firestore via repository)
+         - Placed to the left of the Next button and aligned to its bottom edge -->
     <Button
         android:id="@+id/btnSubmit"
         android:layout_width="wrap_content"
@@ -34,6 +53,10 @@
         app:layout_constraintBottom_toBottomOf="@id/btnNext"
         app:layout_constraintEnd_toStartOf="@id/btnNext" />
 
+    <!-- greenBox:
+         - Main content container (rounded card)
+         - Uses percentage-based sizing so it scales on different devices
+         - Holds the stretch title and instructions -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/greenBox"
         android:layout_width="0dp"
@@ -49,13 +72,16 @@
         app:layout_constraintWidth_percent="0.90"
         app:layout_constraintHeight_percent="0.70">
 
+        <!-- Vertical layout inside the card:
+             - Padding provides spacing from the card edges
+             - Stacks title above instructions -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="20dp">
 
-
+            <!-- Title for the current stretch -->
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
@@ -67,7 +93,7 @@
                 android:gravity="center"
                 android:layout_marginBottom="12dp"/>
 
-
+            <!-- Instructions for the stretch: -->
             <TextView
                 android:id="@+id/tvInstructions"
                 android:layout_width="match_parent"
@@ -84,6 +110,5 @@
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -26,6 +26,7 @@ import com.example.myapplication.databinding.FragmentDashboardBinding
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.myapplication.PuzzleActivity
 
 class DashboardFragment : Fragment() {
 
@@ -103,6 +104,10 @@ class DashboardFragment : Fragment() {
         }
         binding.btnJournal.setOnClickListener {
             val intent = Intent(requireContext(), Journal::class.java)
+            startActivity(intent)
+        }
+        binding.btnPuzzle.setOnClickListener {
+            val intent = Intent(requireContext(), PuzzleActivity::class.java)
             startActivity(intent)
         }
     }
