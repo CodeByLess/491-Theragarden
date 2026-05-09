@@ -16,8 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.Profile
 import com.example.myapplication.QuizTaskPool
 import com.example.myapplication.R
-import com.example.myapplication.RewardRepository
-import com.example.myapplication.SpinWheelActivity
 import com.example.myapplication.Task
 import com.example.myapplication.TaskAdapter
 import com.example.myapplication.TaskLimitManager
