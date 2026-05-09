@@ -61,14 +61,12 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.annotation)
     implementation(libs.firebase.storage)
+
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation(libs.androidx.legacy.support.v4)
     implementation(libs.androidx.fragment.ktx)
     implementation("com.airbnb.android:lottie:6.4.0")
-
-
-
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 

@@ -1,0 +1,237 @@
+Index: app/src/main/java/com/example/myapplication/Profile.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myapplication\n\nimport android.content.Intent\nimport android.os.Bundle\nimport android.widget.Button\nimport android.widget.TextView\nimport android.widget.Toast\nimport androidx.activity.enableEdgeToEdge\nimport androidx.appcompat.app.AppCompatActivity\nimport androidx.core.view.ViewCompat\nimport androidx.core.view.WindowInsetsCompat\nimport com.example.myapplication.util.Collection.USER_COLLECTION // This must match your Registration import\nimport com.google.firebase.auth.FirebaseAuth\nimport com.google.firebase.firestore.FirebaseFirestore\nimport android.widget.ImageView\n\n\n\nclass Profile : AppCompatActivity() {\n\n    private lateinit var firebaseAuth: FirebaseAuth\n    private lateinit var db: FirebaseFirestore\n\n    private lateinit var tvFullName: TextView\n    private lateinit var tvLastName : TextView\n    private lateinit var tvDob: TextView\n    private lateinit var tvEmail: TextView\n    private lateinit var tvCountry: TextView\n\n    override fun onCreate(savedInstanceState: Bundle?) {\n        super.onCreate(savedInstanceState)\n        enableEdgeToEdge()\n        setContentView(R.layout.activity_profile)\n\n        firebaseAuth = FirebaseAuth.getInstance()\n        db = FirebaseFirestore.getInstance()\n\n        // --- 1. SETUP BUTTONS ---\n        // These R.id names MUST match your activity_profile.xml IDs\n        val btnBack = findViewById<Button>(R.id.btnBack)\n        val btnEdit = findViewById<Button>(R.id.edit)\n        val btnDelete = findViewById<Button>(R.id.delete)\n\n        // --- 2. SETUP TEXT FIELDS ---\n        tvFullName = findViewById(R.id.first)\n        tvLastName = findViewById(R.id.last)\n        tvDob = findViewById(R.id.DOB)\n        tvEmail = findViewById(R.id.email)\n        tvCountry = findViewById(R.id.country)\n\n        // Load data on start\n        loadUserInfo()\n\n        // --- 3. BUTTON ACTIONS ---\n\n        btnBack.setOnClickListener { finish() }\n\n        btnEdit.setOnClickListener {\n            val intent = Intent(this, ProfileEditPage::class.java)\n            startActivity(intent)\n        }\n\n\n        btnDelete.setOnClickListener {\n            // DEBUG MSG: If you don't see this pop up, your button ID is wrong!\n            Toast.makeText(this, \"Attempting to delete...\", Toast.LENGTH_SHORT).show()\n\n            deleteAccount()\n        }\n\n        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->\n            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())\n            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)\n            insets\n        }\n    }\n\n    // --- 4. LOAD DATA FUNCTION ---\n    private fun loadUserInfo() {\n        val user = firebaseAuth.currentUser\n        val uid = user?.uid\n\n        if (uid != null) {\n            db.collection(USER_COLLECTION).document(uid).get()\n                .addOnSuccessListener { document ->\n                    if (document != null && document.exists()) {\n                        val first = document.getString(\"firstName\")\n                        val last = document.getString(\"lastName\")\n                        val dob = document.getString(\"dateOfBirth\")\n                        val country = document.getString(\"country\")\n\n                        tvFullName.text = first\n                        tvLastName.text = last\n                        tvDob.text = dob\n                        tvEmail.text = user.email\n                        tvCountry.text = country\n\n                        val avatar = document.getString(\"avatar\") ?: \"dog\"\n                        val profileImage = findViewById<ImageView>(R.id.profile_image)\n\n                        when (avatar) {\n                            \"dog\" -> profileImage.setImageResource(R.drawable.dog)\n                            \"rabbit\" -> profileImage.setImageResource(R.drawable.rabbit)\n                            \"cat\" -> profileImage.setImageResource(R.drawable.cat)\n                            \"butterfly\" -> profileImage.setImageResource(R.drawable.butterfly)\n                        }\n                    }\n                }\n        }\n    }\n\n\n\n    // --- 5. DELETE FUNCTION (Matches your Registration logic) ---\n    private fun deleteAccount() {\n        val user = firebaseAuth.currentUser\n        val uid = user?.uid\n\n        if (uid != null) {\n            // Step 1: Delete the database entry (created in Registration)\n            db.collection(USER_COLLECTION).document(uid)\n                .delete()\n                .addOnSuccessListener {\n                    // Step 2: Delete the Login Account\n                    user.delete().addOnCompleteListener { task ->\n                        if (task.isSuccessful) {\n                            Toast.makeText(this, \"Account Deleted Successfully\", Toast.LENGTH_LONG).show()\n\n                            // Step 3: Send them back to Registration/Login\n                            val intent = Intent(this, Registration::class.java)\n                            // Clear the back stack so they can't go back to Profile\n                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK\n                            startActivity(intent)\n                        } else {\n                            Toast.makeText(this, \"Error deleting login: ${task.exception?.message}\", Toast.LENGTH_SHORT).show()\n                        }\n                    }\n                }\n                .addOnFailureListener { e ->\n                    Toast.makeText(this, \"Error deleting data: ${e.message}\", Toast.LENGTH_SHORT).show()\n                }\n        } else {\n            Toast.makeText(this, \"No user found to delete\", Toast.LENGTH_SHORT).show()\n        }\n    }\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/myapplication/Profile.kt b/app/src/main/java/com/example/myapplication/Profile.kt
+--- a/app/src/main/java/com/example/myapplication/Profile.kt	(revision 8e3f740226a207aacb2807b30df7d5d39c0e63f5)
++++ b/app/src/main/java/com/example/myapplication/Profile.kt	(date 1770167630211)
+@@ -3,29 +3,29 @@
+ import android.content.Intent
+ import android.os.Bundle
+ import android.widget.Button
++import android.widget.ImageView
+ import android.widget.TextView
+ import android.widget.Toast
+ import androidx.activity.enableEdgeToEdge
++import androidx.appcompat.app.AlertDialog
+ import androidx.appcompat.app.AppCompatActivity
+ import androidx.core.view.ViewCompat
+ import androidx.core.view.WindowInsetsCompat
+-import com.example.myapplication.util.Collection.USER_COLLECTION // This must match your Registration import
++import com.example.myapplication.util.Collection.USER_COLLECTION
+ import com.google.firebase.auth.FirebaseAuth
+ import com.google.firebase.firestore.FirebaseFirestore
+-import android.widget.ImageView
+-
+-
+ 
+ class Profile : AppCompatActivity() {
+ 
+     private lateinit var firebaseAuth: FirebaseAuth
+     private lateinit var db: FirebaseFirestore
+ 
+-    private lateinit var tvFullName: TextView
+-    private lateinit var tvLastName : TextView
++    private lateinit var tvFirstName: TextView
++    private lateinit var tvLastName: TextView
+     private lateinit var tvDob: TextView
+     private lateinit var tvEmail: TextView
+     private lateinit var tvCountry: TextView
++    private lateinit var profileImage: ImageView
+ 
+     override fun onCreate(savedInstanceState: Bundle?) {
+         super.onCreate(savedInstanceState)
+@@ -35,24 +35,19 @@
+         firebaseAuth = FirebaseAuth.getInstance()
+         db = FirebaseFirestore.getInstance()
+ 
+-        // --- 1. SETUP BUTTONS ---
+-        // These R.id names MUST match your activity_profile.xml IDs
+         val btnBack = findViewById<Button>(R.id.btnBack)
+         val btnEdit = findViewById<Button>(R.id.edit)
+         val btnDelete = findViewById<Button>(R.id.delete)
+ 
+-        // --- 2. SETUP TEXT FIELDS ---
+-        tvFullName = findViewById(R.id.first)
++        tvFirstName = findViewById(R.id.first)
+         tvLastName = findViewById(R.id.last)
+         tvDob = findViewById(R.id.DOB)
+         tvEmail = findViewById(R.id.email)
+         tvCountry = findViewById(R.id.country)
++        profileImage = findViewById(R.id.profile_image)
+ 
+-        // Load data on start
+         loadUserInfo()
+ 
+-        // --- 3. BUTTON ACTIONS ---
+-
+         btnBack.setOnClickListener { finish() }
+ 
+         btnEdit.setOnClickListener {
+@@ -60,12 +55,8 @@
+             startActivity(intent)
+         }
+ 
+-
+         btnDelete.setOnClickListener {
+-            // DEBUG MSG: If you don't see this pop up, your button ID is wrong!
+-            Toast.makeText(this, "Attempting to delete...", Toast.LENGTH_SHORT).show()
+-
+-            deleteAccount()
++            showDeleteConfirmation()
+         }
+ 
+         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+@@ -75,72 +66,91 @@
+         }
+     }
+ 
+-    // --- 4. LOAD DATA FUNCTION ---
++    override fun onResume() {
++        super.onResume()
++        loadUserInfo()
++    }
++
+     private fun loadUserInfo() {
+         val user = firebaseAuth.currentUser
+         val uid = user?.uid
+ 
+-        if (uid != null) {
+-            db.collection(USER_COLLECTION).document(uid).get()
+-                .addOnSuccessListener { document ->
+-                    if (document != null && document.exists()) {
+-                        val first = document.getString("firstName")
+-                        val last = document.getString("lastName")
+-                        val dob = document.getString("dateOfBirth")
+-                        val country = document.getString("country")
+-
+-                        tvFullName.text = first
+-                        tvLastName.text = last
+-                        tvDob.text = dob
+-                        tvEmail.text = user.email
+-                        tvCountry.text = country
+-
+-                        val avatar = document.getString("avatar") ?: "dog"
+-                        val profileImage = findViewById<ImageView>(R.id.profile_image)
++        if (uid == null) {
++            Toast.makeText(this, "No user logged in", Toast.LENGTH_SHORT).show()
++            return
++        }
++
++        db.collection(USER_COLLECTION).document(uid).get()
++            .addOnSuccessListener { document ->
++                if (document != null && document.exists()) {
++                    val first = document.getString("firstName")
++                    val last = document.getString("lastName")
++                    val dob = document.getString("dateOfBirth")
++                    val country = document.getString("country")
++                    val avatar = document.getString("avatar") ?: "dog"
++
++                    tvFirstName.text = first ?: ""
++                    tvLastName.text = last ?: ""
++                    tvDob.text = dob ?: ""
++                    tvEmail.text = user.email ?: ""
++                    tvCountry.text = country ?: ""
+ 
+-                        when (avatar) {
+-                            "dog" -> profileImage.setImageResource(R.drawable.dog)
+-                            "rabbit" -> profileImage.setImageResource(R.drawable.rabbit)
+-                            "cat" -> profileImage.setImageResource(R.drawable.cat)
+-                            "butterfly" -> profileImage.setImageResource(R.drawable.butterfly)
+-                        }
+-                    }
+-                }
+-        }
++                    when (avatar) {
++                        "dog" -> profileImage.setImageResource(R.drawable.dog)
++                        "rabbit" -> profileImage.setImageResource(R.drawable.rabbit)
++                        "cat" -> profileImage.setImageResource(R.drawable.cat)
++                        "butterfly" -> profileImage.setImageResource(R.drawable.butterfly)
++                        else -> profileImage.setImageResource(R.drawable.dog)
++                    }
++                } else {
++                    Toast.makeText(this, "Profile not found in database", Toast.LENGTH_SHORT).show()
++                }
++            }
++            .addOnFailureListener { e ->
++                Toast.makeText(this, "Failed to load profile: ${e.message}", Toast.LENGTH_LONG).show()
++            }
+     }
+ 
++    private fun showDeleteConfirmation() {
++        AlertDialog.Builder(this)
++            .setTitle("Delete Account?")
++            .setMessage("This will permanently delete your profile and account. This cannot be undone.")
++            .setPositiveButton("Delete") { _, _ ->
++                deleteAccount()
++            }
++            .setNegativeButton("Cancel", null)
++            .show()
++    }
+ 
+-
+-    // --- 5. DELETE FUNCTION (Matches your Registration logic) ---
+     private fun deleteAccount() {
+         val user = firebaseAuth.currentUser
+         val uid = user?.uid
+ 
+-        if (uid != null) {
+-            // Step 1: Delete the database entry (created in Registration)
+-            db.collection(USER_COLLECTION).document(uid)
+-                .delete()
+-                .addOnSuccessListener {
+-                    // Step 2: Delete the Login Account
+-                    user.delete().addOnCompleteListener { task ->
+-                        if (task.isSuccessful) {
+-                            Toast.makeText(this, "Account Deleted Successfully", Toast.LENGTH_LONG).show()
+-
+-                            // Step 3: Send them back to Registration/Login
+-                            val intent = Intent(this, Registration::class.java)
+-                            // Clear the back stack so they can't go back to Profile
+-                            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+-                            startActivity(intent)
+-                        } else {
+-                            Toast.makeText(this, "Error deleting login: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+-                        }
+-                    }
+-                }
+-                .addOnFailureListener { e ->
+-                    Toast.makeText(this, "Error deleting data: ${e.message}", Toast.LENGTH_SHORT).show()
+-                }
+-        } else {
+-            Toast.makeText(this, "No user found to delete", Toast.LENGTH_SHORT).show()
+-        }
+-    }
+-}
+\ No newline at end of file
++        if (uid == null || user == null) {
++            Toast.makeText(this, "No user found to delete", Toast.LENGTH_SHORT).show()
++            return
++        }
++
++        db.collection(USER_COLLECTION).document(uid)
++            .delete()
++            .addOnSuccessListener {
++                user.delete().addOnCompleteListener { task ->
++                    if (task.isSuccessful) {
++                        Toast.makeText(this, "Account deleted", Toast.LENGTH_LONG).show()
++                        val intent = Intent(this, Registration::class.java)
++                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
++                        startActivity(intent)
++                    } else {
++                        Toast.makeText(
++                            this,
++                            "Error deleting login: ${task.exception?.message}",
++                            Toast.LENGTH_SHORT
++                        ).show()
++                    }
++                }
++            }
++            .addOnFailureListener { e ->
++                Toast.makeText(this, "Error deleting data: ${e.message}", Toast.LENGTH_SHORT).show()
++            }
++    }
++}
