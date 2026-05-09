@@ -12,13 +12,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.appcompat.app.AlertDialog
 import com.example.myapplication.Profile
+import com.example.myapplication.R
 import com.example.myapplication.TaskAdapter
 import com.example.myapplication.TaskRepository
 import com.example.myapplication.databinding.FragmentHomeBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
-import com.example.myapplication.R
 import java.util.Calendar
 
 /*
