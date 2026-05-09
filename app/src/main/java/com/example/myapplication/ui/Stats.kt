@@ -6,17 +6,35 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import com.example.myapplication.ui.CalendarAdapter
+import com.example.myapplication.ui.CalendarDay
 import com.example.myapplication.R
 import com.example.myapplication.TaskRepository
 import com.example.myapplication.databinding.FragmentStatsBinding
+import com.github.mikephil.charting.components.Description
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+
+// Added by merge fix:
+// MoodEntry data class used for mood records from Firestore.
+data class MoodEntry(
+    val id: String = "",
+    val mood: String = "",
+    val createdAt: Long = 0L
+)
 
 // Added by Lesley Del Cid:
 // Stats Fragment handles the interactive statistics screen.
@@ -28,8 +46,8 @@ class Stats : Fragment() {
     private var _binding: FragmentStatsBinding? = null
     private val binding get() = _binding!!
 
-    private val db = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
+    private val auth by lazy { FirebaseAuth.getInstance() }
+    private val db by lazy { FirebaseFirestore.getInstance() }
 
     // Added by Lesley Del Cid:
     // Stores the currently selected date in yyyy-MM-dd format.
@@ -59,6 +77,17 @@ class Stats : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentStatsBinding.inflate(inflater, container, false)
+
+        setupChart()
+
+        binding.btnSelfCareHub.setOnClickListener {
+            activity
+                ?.findViewById<com.google.android.material.bottomnavigation.BottomNavigationView>(R.id.nav_view)
+                ?.selectedItemId = R.id.navigation_dashboard
+        }
+
+        loadMoodStats()
+
         return binding.root
     }
 
@@ -67,40 +96,28 @@ class Stats : Fragment() {
 
         val repository = TaskRepository()
 
-        // Added by Lesley Del Cid:
-        // Start the Stats page by selecting today's date.
         selectedDateString = getTodayString()
 
         setupCalendarRecyclerView()
 
-        // Added by Lesley Del Cid:
-        // Moves the calendar to the previous month.
         binding.btnPreviousMonth.setOnClickListener {
             visibleMonthCalendar.add(Calendar.MONTH, -1)
             refreshCalendarGrid()
         }
 
-        // Added by Lesley Del Cid:
-        // Moves the calendar to the next month.
         binding.btnNextMonth.setOnClickListener {
             visibleMonthCalendar.add(Calendar.MONTH, 1)
             refreshCalendarGrid()
         }
 
-        // Added by Lesley Del Cid:
-        // Loads all dates that need task/plant dots on the calendar.
         loadCalendarMarkers()
 
-        // Added by Lesley Del Cid:
-        // Displays the user's overall day streak.
         repository.listenToCurrentStreak { streak ->
             if (_binding != null) {
                 binding.txtDayStreak.text = "Day streak: $streak"
             }
         }
 
-        // Added by Lesley Del Cid:
-        // Displays each individual habit streak.
         repository.listenToHabitStreaks { streaks ->
             if (_binding != null) {
                 binding.txtHabitStreaks.text =
@@ -114,13 +131,183 @@ class Stats : Fragment() {
             }
         }
 
-        // Added by Lesley Del Cid:
-        // Loads today's selected-day details and summaries when the page opens.
         loadSelectedDate(selectedDateString)
     }
 
-    // Added by Lesley Del Cid:
-    // Sets up the custom calendar RecyclerView using 7 columns for the week.
+    override fun onResume() {
+        super.onResume()
+        loadMoodStats()
+    }
+
+    private fun setupChart() {
+        val chart = binding.moodChart
+
+        chart.setBackgroundColor(
+            ContextCompat.getColor(requireContext(), R.color.dark_gray_brown)
+        )
+
+        chart.setNoDataText("No mood data yet.")
+        chart.setNoDataTextColor(
+            ContextCompat.getColor(requireContext(), R.color.white)
+        )
+
+        val description = Description()
+        description.text = ""
+        chart.description = description
+
+        chart.axisRight.isEnabled = false
+        chart.legend.textColor = ContextCompat.getColor(requireContext(), R.color.white)
+
+        chart.axisLeft.apply {
+            axisMinimum = 1f
+            axisMaximum = 3f
+            granularity = 1f
+            textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            setDrawGridLines(false)
+
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return when (value.toInt()) {
+                        1 -> "Mad"
+                        2 -> "Okay"
+                        3 -> "Happy"
+                        else -> ""
+                    }
+                }
+            }
+        }
+
+        chart.xAxis.apply {
+            position = XAxis.XAxisPosition.BOTTOM
+            textColor = ContextCompat.getColor(requireContext(), R.color.white)
+            setDrawGridLines(false)
+            granularity = 1f
+        }
+    }
+
+    private fun loadMoodStats() {
+        val uid = auth.currentUser?.uid ?: run {
+            binding.tvStatus.text = "You must be logged in."
+            return
+        }
+
+        binding.tvStatus.text = "Loading mood statistics..."
+
+        db.collection("users")
+            .document(uid)
+            .collection("moodEntries")
+            .orderBy("createdAt")
+            .get()
+            .addOnSuccessListener { result ->
+
+                val entries = result.documents.mapNotNull { doc ->
+                    val mood = doc.getString("mood") ?: return@mapNotNull null
+                    val createdAt = doc.getLong("createdAt") ?: 0L
+
+                    MoodEntry(
+                        id = doc.id,
+                        mood = mood,
+                        createdAt = createdAt
+                    )
+                }
+
+                if (entries.isEmpty()) {
+                    binding.tvLatestMood.text = "Latest: --"
+                    binding.tvAverageMood.text = "Average: --"
+                    binding.tvHighestMood.text = "Highest: --"
+                    binding.tvLowestMood.text = "Lowest: --"
+                    binding.tvTotalEntries.text = "Entries: 0"
+                    binding.tvSupportMessage.text = ""
+                    binding.btnSelfCareHub.visibility = View.GONE
+                    binding.tvStatus.text = "No mood entries found yet."
+                    binding.moodChart.clear()
+                    return@addOnSuccessListener
+                }
+
+                val scores = entries.map { moodToScore(it.mood) }
+                val avg = scores.average()
+
+                val latestMood = entries.last().mood
+                val highest = scores.maxOrNull() ?: 0
+                val lowest = scores.minOrNull() ?: 0
+
+                binding.tvLatestMood.text =
+                    "Latest: ${latestMood.replaceFirstChar { it.uppercase() }}"
+
+                binding.tvAverageMood.text =
+                    "Average: ${"%.2f".format(avg)} / 3"
+
+                binding.tvHighestMood.text =
+                    "Highest: ${scoreToMood(highest)}"
+
+                binding.tvLowestMood.text =
+                    "Lowest: ${scoreToMood(lowest)}"
+
+                binding.tvTotalEntries.text =
+                    "Entries: ${entries.size}"
+
+                binding.tvStatus.text = ""
+
+                renderChart(entries)
+                showSupport(latestMood, avg)
+            }
+            .addOnFailureListener { e ->
+                binding.tvStatus.text = "Failed to load mood statistics: ${e.message}"
+            }
+    }
+
+    private fun renderChart(entries: List<MoodEntry>) {
+        val chartEntries = entries.mapIndexed { index, entry ->
+            Entry(index.toFloat(), moodToScore(entry.mood).toFloat())
+        }
+
+        val dataSet = LineDataSet(chartEntries, "Mood Trend").apply {
+            setColor(ContextCompat.getColor(requireContext(), R.color.gray_green))
+            setCircleColor(ContextCompat.getColor(requireContext(), R.color.white))
+            lineWidth = 3f
+            circleRadius = 6f
+            setDrawValues(false)
+            valueTextColor = ContextCompat.getColor(requireContext(), R.color.white)
+        }
+
+        val lineData = LineData(dataSet)
+        binding.moodChart.data = lineData
+
+        val xLabels = entries.indices.map { "Entry ${it + 1}" }
+        binding.moodChart.xAxis.valueFormatter = IndexAxisValueFormatter(xLabels)
+        binding.moodChart.xAxis.labelCount = xLabels.size
+
+        binding.moodChart.invalidate()
+    }
+
+    private fun showSupport(latest: String, avg: Double) {
+        val isLow = latest == "mad" || avg < 2.0
+
+        if (isLow) {
+            binding.tvSupportMessage.text =
+                "You're not feeling your best. Try the Self-Care Hub."
+            binding.btnSelfCareHub.visibility = View.VISIBLE
+        } else {
+            binding.tvSupportMessage.text =
+                "You're doing well. Keep tracking!"
+            binding.btnSelfCareHub.visibility = View.GONE
+        }
+    }
+
+    private fun moodToScore(m: String): Int = when (m.lowercase()) {
+        "happy" -> 3
+        "okay" -> 2
+        "mad" -> 1
+        else -> 0
+    }
+
+    private fun scoreToMood(score: Int): String = when (score) {
+        3 -> "Happy"
+        2 -> "Okay"
+        1 -> "Mad"
+        else -> "Unknown"
+    }
+
     private fun setupCalendarRecyclerView() {
         calendarAdapter = CalendarAdapter(emptyList()) { selectedDay ->
             selectedDateString = selectedDay.dateString
@@ -137,8 +324,6 @@ class Stats : Fragment() {
         refreshCalendarGrid()
     }
 
-    // Added by Lesley Del Cid:
-    // Reads Firestore to find which dates should show task dots and plant dots.
     private fun loadCalendarMarkers() {
         val uid = auth.currentUser?.uid ?: return
 
@@ -181,9 +366,6 @@ class Stats : Fragment() {
             }
     }
 
-    // Added by Lesley Del Cid:
-    // Builds the calendar grid for the visible month.
-    // Blank cells are added before day 1 so dates line up under the correct weekday.
     private fun refreshCalendarGrid() {
         val formatter = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
         binding.txtMonthTitle.text = formatter.format(visibleMonthCalendar.time)
@@ -200,8 +382,6 @@ class Stats : Fragment() {
         val calendarDays = mutableListOf<CalendarDay>()
         val todayString = getTodayString()
 
-        // Added by Lesley Del Cid:
-        // Add blank cells before the first day of the month.
         for (i in 1 until firstDayOfWeek) {
             calendarDays.add(
                 CalendarDay(
@@ -212,8 +392,6 @@ class Stats : Fragment() {
             )
         }
 
-        // Added by Lesley Del Cid:
-        // Add the real calendar days with selected/today states and activity dots.
         for (day in 1..daysInMonth) {
             val dateString = String.format(
                 Locale.getDefault(),
@@ -238,22 +416,16 @@ class Stats : Fragment() {
         calendarAdapter.updateDays(calendarDays)
     }
 
-    // Added by Lesley Del Cid:
-    // Returns today's date in yyyy-MM-dd format.
     private fun getTodayString(): String {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return sdf.format(Calendar.getInstance().time)
     }
 
-    // Added by Lesley Del Cid:
-    // Converts a Firebase Timestamp into yyyy-MM-dd format.
     private fun timestampToDateString(timestamp: Timestamp): String {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         return sdf.format(timestamp.toDate())
     }
 
-    // Added by Lesley Del Cid:
-    // Converts a yyyy-MM-dd string into a Calendar object for week/month checks.
     private fun dateStringToCalendar(date: String): Calendar {
         val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val calendar = Calendar.getInstance()
@@ -261,8 +433,6 @@ class Stats : Fragment() {
         return calendar
     }
 
-    // Added by Lesley Del Cid:
-    // Checks if a date belongs to the same week as the selected date.
     private fun isSameWeek(date: String, selectedDate: String): Boolean {
         val dateCal = dateStringToCalendar(date)
         val selectedCal = dateStringToCalendar(selectedDate)
@@ -271,8 +441,6 @@ class Stats : Fragment() {
                 dateCal.get(Calendar.WEEK_OF_YEAR) == selectedCal.get(Calendar.WEEK_OF_YEAR)
     }
 
-    // Added by Lesley Del Cid:
-    // Checks if a date belongs to the same month as the selected date.
     private fun isSameMonth(date: String, selectedDate: String): Boolean {
         val dateCal = dateStringToCalendar(date)
         val selectedCal = dateStringToCalendar(selectedDate)
@@ -281,8 +449,6 @@ class Stats : Fragment() {
                 dateCal.get(Calendar.MONTH) == selectedCal.get(Calendar.MONTH)
     }
 
-    // Added by Lesley Del Cid:
-    // Loads selected-day details and summary information.
     private fun loadSelectedDate(date: String) {
         val uid = auth.currentUser?.uid ?: return
 
@@ -298,9 +464,6 @@ class Stats : Fragment() {
         loadSummaryTotals(uid, date)
     }
 
-    // Added by Lesley Del Cid:
-    // Loads completed tasks and plants grown on the selected date.
-    // Combines data from dailyLogs and garden Firestore collections.
     private fun loadSelectedDayDetails(uid: String, date: String) {
         db.collection("users")
             .document(uid)
@@ -352,9 +515,6 @@ class Stats : Fragment() {
             }
     }
 
-    // Added by Lesley Del Cid:
-    // Displays plant images in rows of 3.
-    // This prevents overflow when multiple plants were grown on the same day.
     private fun showPlantImages(plants: List<String>) {
         if (plants.isEmpty()) {
             binding.plantPreviewContainer.visibility = View.GONE
@@ -367,8 +527,6 @@ class Stats : Fragment() {
 
         plants.forEachIndexed { index, seedName ->
 
-            // Added by Lesley Del Cid:
-            // Create a new horizontal row after every 3 plant images.
             if (index % 3 == 0) {
                 currentRow = LinearLayout(requireContext()).apply {
                     orientation = LinearLayout.HORIZONTAL
@@ -398,22 +556,37 @@ class Stats : Fragment() {
         }
     }
 
-    // Added by Lesley Del Cid:
-    // Matches a saved seed name from Firestore to its drawable image.
+    // Added by Lesley:
+    // Returns the correct plant image for starter seeds,
+    // shop seeds, and spin wheel exclusive plants
+    // inside the Stats calendar preview.
     private fun getPlantImageResource(seedName: String): Int? {
         return when (seedName) {
+
+            // Starter seeds
             "Sunflower Seed" -> R.drawable.sunflower
             "Strawberry Seed" -> R.drawable.strawberry
             "Lavender Seed" -> R.drawable.lavender
             "Tulip Seed" -> R.drawable.tulip
             "Cactus Seed" -> R.drawable.cactus
             "Monstera Seed" -> R.drawable.monstera
+
+            // Shop seeds
+            "Bonsai Tree" -> R.drawable.bonsai
+            "Cherry Blossom" -> R.drawable.cherryblossoms
+            "Palm Tree" -> R.drawable.palmtree
+            "Venus Flytrap" -> R.drawable.venusflytrap
+
+            // Spin wheel plants
+            "Trumpet Flower" -> R.drawable.trumpetflower
+            "Blue Rose" -> R.drawable.bluerose
+            "Crystal Lotus" -> R.drawable.crystallotus
+            "Rainbow Tulip" -> R.drawable.rainbowtulip
+
             else -> null
         }
     }
 
-    // Added by Lesley Del Cid:
-    // Calculates weekly and monthly totals for completed tasks and grown plants.
     private fun loadSummaryTotals(uid: String, selectedDate: String) {
         var weeklyTasks = 0
         var monthlyTasks = 0

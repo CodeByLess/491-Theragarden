@@ -39,6 +39,7 @@ class TaskRepository {
         return sdf.format(Date())
     }
 
+
     /**
      * Adds a completed task to today's daily log.
      *
@@ -112,6 +113,8 @@ class TaskRepository {
             transaction.set(dailyLogRef, update, SetOptions.merge())
         }
     }
+
+
 
     /**
      * Listens for real-time updates to the user's task list.

@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.util
+package com.example.myapplication.ui
 
 // Added by Lesley Del Cid:
 // Represents one cell in the custom Stats calendar.

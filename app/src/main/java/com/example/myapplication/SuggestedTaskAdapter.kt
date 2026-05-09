@@ -15,7 +15,7 @@ class SuggestedTaskAdapter (
     val selectedTasks = mutableSetOf<String>()
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val checkBox: CheckBox = view.findViewById(R.id.checkBox)
+        val checkBox: CheckBox = view.findViewById(R.id.checkboxTask)
         val title: TextView = view.findViewById(R.id.tvTitle)
     }
 

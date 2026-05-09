@@ -143,6 +143,103 @@ class RewardRepository {
             }
     }
 
+    // Added by Paula Awad:
+    // Checks if the user already bought access to the Spin Wheel.
+    fun isSpinWheelUnlocked(onResult: (Boolean) -> Unit) {
+        val ref = userRef() ?: run {
+            onResult(false)
+            return
+        }
+
+        ref.get().addOnSuccessListener { document ->
+            val unlocked = document.getBoolean("spinWheelUnlocked") ?: false
+            onResult(unlocked)
+        }.addOnFailureListener {
+            onResult(false)
+        }
+    }
+
+    // Added by Paula Awad:
+    // Unlocks the Spin Wheel by charging 200 Bloom Points.
+    fun buySpinWheelAccess(onResult: (Boolean, String) -> Unit) {
+        val ref = userRef() ?: run {
+            onResult(false, "User not signed in.")
+            return
+        }
+
+        val spinWheelPrice = 200
+
+        ref.get().addOnSuccessListener { document ->
+            val currentPoints = document.getLong("bloomPoints")?.toInt() ?: 0
+            val alreadyUnlocked = document.getBoolean("spinWheelUnlocked") ?: false
+
+            if (alreadyUnlocked) {
+                onResult(true, "Spin Wheel is already unlocked.")
+                return@addOnSuccessListener
+            }
+
+            if (currentPoints < spinWheelPrice) {
+                onResult(false, "You need 200 Bloom Points to unlock the Spin Wheel.")
+                return@addOnSuccessListener
+            }
+
+            ref.set(
+                mapOf(
+                    "bloomPoints" to currentPoints - spinWheelPrice,
+                    "spinWheelUnlocked" to true
+                ),
+                SetOptions.merge()
+            ).addOnSuccessListener {
+                onResult(true, "Spin Wheel unlocked!")
+            }.addOnFailureListener {
+                onResult(false, "Could not unlock Spin Wheel.")
+            }
+        }.addOnFailureListener {
+            onResult(false, "Could not load Bloom Points.")
+        }
+    }
+
+    // Added by Lesley:
+    // Charges 200 Bloom Points every time the user spins the wheel.
+    fun buySpin(onResult: (Boolean, String) -> Unit) {
+
+        val ref = userRef() ?: run {
+            onResult(false, "User not signed in.")
+            return
+        }
+
+        val spinPrice = 200
+
+        ref.get().addOnSuccessListener { document ->
+
+            val currentPoints =
+                document.getLong("bloomPoints")?.toInt() ?: 0
+
+            // Not enough Bloom Points
+            if (currentPoints < spinPrice) {
+                onResult(false, "You need 200 Bloom Points to spin.")
+                return@addOnSuccessListener
+            }
+
+            // Remove 200 points
+            ref.update(
+                "bloomPoints",
+                currentPoints - spinPrice
+            ).addOnSuccessListener {
+
+                onResult(true, "Spin purchased.")
+
+            }.addOnFailureListener {
+
+                onResult(false, "Could not purchase spin.")
+            }
+
+        }.addOnFailureListener {
+
+            onResult(false, "Could not load Bloom Points.")
+        }
+    }
+
     // Return shop items and their prices
     fun getShopSeeds(): Map<String, Int> {
         return mapOf(
@@ -181,30 +278,21 @@ class RewardRepository {
 
             // Check if user has enough currency
             if (currentPoints < price) {
-                onResult(false, "Not enough Bloom Points.")
+                onResult(false, "Not enough Bloom Points. $seedName costs $price Bloom Points.")
                 return@addOnSuccessListener
             }
 
             // Deduct points and unlock seed
-            ref.update(
+            ref.set(
                 mapOf(
                     "bloomPoints" to currentPoints - price,
                     "shopUnlockedSeeds" to FieldValue.arrayUnion(seedName)
-                )
+                ),
+                SetOptions.merge()
             ).addOnSuccessListener {
-                onResult(true, "You bought $seedName.")
+                onResult(true, "You bought $seedName for $price Bloom Points.")
             }.addOnFailureListener {
-                ref.set(
-                    mapOf(
-                        "bloomPoints" to currentPoints - price,
-                        "shopUnlockedSeeds" to listOf(seedName)
-                    ),
-                    SetOptions.merge()
-                ).addOnSuccessListener {
-                    onResult(true, "You bought $seedName.")
-                }.addOnFailureListener {
-                    onResult(false, "Purchase failed.")
-                }
+                onResult(false, "Purchase failed.")
             }
         }.addOnFailureListener {
             onResult(false, "Could not load shop data.")

@@ -6,9 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.notifications.NotificationsFragment"
-    android:background="@color/dark_gray_brown"
     android:fitsSystemWindows="true">
-    //about page title and text
+
     <TextView
         android:id="@+id/about"
         android:layout_width="0dp"
@@ -27,7 +26,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    //Report button
+
     <Button
         android:id="@+id/btnReport"
         android:layout_width="wrap_content"
@@ -37,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnFeedback"  />
-    //Feedback button
+
     <Button
         android:id="@+id/btnFeedback"
         android:layout_width="wrap_content"
@@ -47,7 +46,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/about" />
-    //Tutorial button
+
     <Button
         android:id="@+id/btnTutorial"
         android:layout_width="wrap_content"

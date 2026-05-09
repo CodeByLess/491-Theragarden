@@ -28,7 +28,10 @@ class Seeds : AppCompatActivity() {
       - These seeds appear as selectable options in the Seedpack screen.
       - Each seed corresponds to a bloom image shown later in HomeFragment.
     */
-    private val starterSeeds = listOf(
+
+    // Added by Lesley:
+    // Starter seeds always available to the player.
+    private val starterSeeds = mutableListOf(
         "Sunflower Seed",
         "Strawberry Seed",
         "Lavender Seed",
@@ -48,38 +51,21 @@ class Seeds : AppCompatActivity() {
             finish() // return to Home
         }
 
-        // Hook up the 6 seed buttons (inventory items)
+        // Hook up the seed buttons (inventory items)
         val seed1 = findViewById<Button>(R.id.btnSeed1)
         val seed2 = findViewById<Button>(R.id.btnSeed2)
         val seed3 = findViewById<Button>(R.id.btnSeed3)
         val seed4 = findViewById<Button>(R.id.btnSeed4)
         val seed5 = findViewById<Button>(R.id.btnSeed5)
         val seed6 = findViewById<Button>(R.id.btnSeed6)
+        val seed7 = findViewById<Button>(R.id.btnSeed7)
+        val seed8 = findViewById<Button>(R.id.btnSeed8)
+        val seed9 = findViewById<Button>(R.id.btnSeed9)
+        val seed10 = findViewById<Button>(R.id.btnSeed10)
 
-        /*
-          Set button labels from our starter seed list.
-          This keeps the UI text consistent with the seed names stored in code.
-        */
-        seed1.text = starterSeeds[0]
-        seed2.text = starterSeeds[1]
-        seed3.text = starterSeeds[2]
-        seed4.text = starterSeeds[3]
-        seed5.text = starterSeeds[4]
-        seed6.text = starterSeeds[5]
-
-        /*
-          When a seed is clicked, save it and reset the current plant cycle.
-
-          NOTE:
-          - Only assign one click listener per button.
-          - The completedPlants total should remain unchanged.
-        */
-        seed1.setOnClickListener { chooseSeed(starterSeeds[0]) }
-        seed2.setOnClickListener { chooseSeed(starterSeeds[1]) }
-        seed3.setOnClickListener { chooseSeed(starterSeeds[2]) }
-        seed4.setOnClickListener { chooseSeed(starterSeeds[3]) }
-        seed5.setOnClickListener { chooseSeed(starterSeeds[4]) }
-        seed6.setOnClickListener { chooseSeed(starterSeeds[5]) }
+        // Added by Lesley:
+        // Load purchased shop seeds and spin wheel seeds into inventory.
+        loadShopSeeds()
 
         // Window insets (kept)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
@@ -87,6 +73,88 @@ class Seeds : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    /*
+      loadShopSeeds()
+      - Loads purchased shop seeds from Firestore.
+      - Adds them into the inventory list so they appear
+        in the Seedpack screen after purchase.
+      - Also loads Spin Wheel exclusive seeds.
+    */
+    private fun loadShopSeeds() {
+
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { document ->
+
+                val shopSeeds =
+                    document.get("shopUnlockedSeeds") as? List<String> ?: emptyList()
+
+                // Added by Lesley:
+                // Loads spin wheel reward seeds.
+                val spinSeeds =
+                    document.get("spinUnlockedSeeds") as? List<String> ?: emptyList()
+
+                // Add purchased shop seeds into inventory
+                for (seed in shopSeeds) {
+                    if (!starterSeeds.contains(seed)) {
+                        starterSeeds.add(seed)
+                    }
+                }
+
+                // Add spin wheel seeds into inventory
+                for (seed in spinSeeds) {
+                    if (!starterSeeds.contains(seed)) {
+                        starterSeeds.add(seed)
+                    }
+                }
+
+                // Added by Lesley:
+                // Includes extra buttons for purchased shop seeds
+                // and spin wheel reward seeds.
+                val buttons = listOf(
+                    findViewById<Button>(R.id.btnSeed1),
+                    findViewById<Button>(R.id.btnSeed2),
+                    findViewById<Button>(R.id.btnSeed3),
+                    findViewById<Button>(R.id.btnSeed4),
+                    findViewById<Button>(R.id.btnSeed5),
+                    findViewById<Button>(R.id.btnSeed6),
+                    findViewById<Button>(R.id.btnSeed7),
+                    findViewById<Button>(R.id.btnSeed8),
+                    findViewById<Button>(R.id.btnSeed9),
+                    findViewById<Button>(R.id.btnSeed10),
+
+                    // Added by Lesley:
+                    // Spin Wheel exclusive seed buttons.
+                    findViewById<Button>(R.id.btnSeed11),
+                    findViewById<Button>(R.id.btnSeed12),
+                    findViewById<Button>(R.id.btnSeed13),
+                    findViewById<Button>(R.id.btnSeed14)
+                )
+
+                for (i in buttons.indices) {
+
+                    if (i < starterSeeds.size) {
+
+                        buttons[i].visibility = Button.VISIBLE
+                        buttons[i].text = starterSeeds[i]
+
+                        buttons[i].setOnClickListener {
+                            chooseSeed(starterSeeds[i])
+                        }
+
+                    } else {
+
+                        // Hide unused buttons if fewer than available button slots
+                        buttons[i].visibility = Button.GONE
+                    }
+                }
+            }
     }
 
     /*
@@ -99,6 +167,7 @@ class Seeds : AppCompatActivity() {
         for the newly selected plant.
     */
     private fun chooseSeed(seedName: String) {
+
         val uid = FirebaseAuth.getInstance().currentUser?.uid
 
         if (uid == null) {
@@ -133,6 +202,7 @@ class Seeds : AppCompatActivity() {
                   when the user starts a new plant cycle.
                 */
                 val prefs = getSharedPreferences("plant_popups", Context.MODE_PRIVATE)
+
                 prefs.edit()
                     .putString("lastStageShown", "dirt")
                     .putBoolean("lastCompletedShown", false)
@@ -140,8 +210,10 @@ class Seeds : AppCompatActivity() {
                     .apply()
 
                 Toast.makeText(this, "You chose: $seedName", Toast.LENGTH_SHORT).show()
+
                 finish() // go back to Home
             }
+
             .addOnFailureListener {
                 Toast.makeText(this, "Failed to choose seed.", Toast.LENGTH_SHORT).show()
             }

@@ -1,6 +1,5 @@
 package com.example.myapplication.ui.home
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -21,8 +20,8 @@ import com.example.myapplication.RewardRepository
 import com.example.myapplication.SpinWheelActivity
 import com.example.myapplication.Task
 import com.example.myapplication.TaskAdapter
-import com.example.myapplication.TaskRepository
 import com.example.myapplication.TaskLimitManager
+import com.example.myapplication.TaskRepository
 import com.example.myapplication.databinding.FragmentHomeBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -61,14 +60,13 @@ class HomeFragment : Fragment() {
     private lateinit var limitManager: TaskLimitManager
     private var currentTasks = mutableListOf<Task>()
 
-    // Inflate the layout and initialize binding
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         val homeViewModel =
-            ViewModelProvider(this)[HomeViewModel::class.java]
+            ViewModelProvider(this).get(HomeViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
@@ -100,7 +98,49 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // Main UI setup and logic
+    private fun getGreetingBadge(): String {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+
+        return when (hour) {
+            in 5..11 -> "GM"
+            in 12..16 -> "GA"
+            in 17..20 -> "GE"
+            else -> "GN"
+        }
+    }
+
+    private fun showShopDialog(rewardRepository: RewardRepository) {
+
+        val shopSeeds = rewardRepository.getShopSeeds()
+
+        // Added by Lesley:
+        // Internal seed names used when buying seeds.
+        val seedNames = shopSeeds.keys.toTypedArray()
+
+        // Added by Lesley:
+        // Display names shown in the popup with prices included.
+        val seedDisplayNames = shopSeeds.map { (seedName, price) ->
+            "$seedName - $price Bloom Points"
+        }.toTypedArray()
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Seed Shop")
+            .setItems(seedDisplayNames) { _, which ->
+
+                // Uses the original seed name internally
+                val selectedSeed = seedNames[which]
+
+                rewardRepository.buyShopSeed(selectedSeed) { success, message ->
+                    showRewardPopup(
+                        if (success) "Shop Purchase" else "Shop",
+                        message
+                    )
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -112,6 +152,49 @@ class HomeFragment : Fragment() {
         binding.btnProfile.setOnClickListener {
             val intent = Intent(requireContext(), Profile::class.java)
             startActivity(intent)
+        }
+
+        // Added by Paula Awad:
+        // Opens the Spin Wheel reward system from the Home screen.
+        binding.btnSpinWheel.setOnClickListener {
+            rewardRepository.isSpinWheelUnlocked { unlocked ->
+                if (unlocked) {
+                    val intent = Intent(requireContext(), SpinWheelActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Unlock Spin Wheel")
+                        .setMessage("The Spin Wheel costs 200 Bloom Points to unlock. Do you want to buy it?")
+                        .setPositiveButton("Buy") { _, _ ->
+                            rewardRepository.buySpinWheelAccess { success, message ->
+                                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+
+                                if (success) {
+                                    val intent = Intent(requireContext(), SpinWheelActivity::class.java)
+                                    startActivity(intent)
+                                }
+                            }
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                }
+            }
+        }
+
+        // Added by Paula Awad:
+        // Shows the greeting badge on the top right based on the current time.
+        binding.tvTimeBadge.text = getGreetingBadge()
+
+        // Added by Paula Awad:
+        // Connects Bloom Points and the Seed Shop button to RewardRepository.
+        rewardRepository.listenToBloomPoints { points ->
+            if (_binding != null) {
+                binding.txtBloomPoints.text = "🌸 Bloom Points: $points"
+            }
+        }
+
+        binding.btnOpenShop.setOnClickListener {
+            showShopDialog(rewardRepository)
         }
 
         /*Added by Lesley Del Cid:
@@ -149,7 +232,6 @@ class HomeFragment : Fragment() {
                 val plantProgress = snapshot?.getLong("plantProgress")?.toInt() ?: 0
                 binding.plantProgressBar.progress = plantProgress
                 updateVerticalPlantMeter(plantProgress)
-
                 val plantCompleted = snapshot?.getBoolean("plantCompleted") ?: false
                 val plantStage = snapshot?.getString("plantStage") ?: "dirt"
 
@@ -168,19 +250,39 @@ class HomeFragment : Fragment() {
                     the selected seed.
                 */
                 val imageRes = when (plantStage.lowercase()) {
+
                     "dirt" -> R.drawable.dirt
                     "sprout" -> R.drawable.sprout
+
+                    // Added by Lesley:
+                    // Uses a unique bloom image for each unlocked seed.
                     "bloom" -> {
                         when (currentSeedId) {
+
+                            // Starter seeds
                             "Sunflower Seed" -> R.drawable.sunflower
                             "Strawberry Seed" -> R.drawable.strawberry
                             "Lavender Seed" -> R.drawable.lavender
                             "Tulip Seed" -> R.drawable.tulip
                             "Cactus Seed" -> R.drawable.cactus
                             "Monstera Seed" -> R.drawable.monstera
+
+                            // Shop seeds
+                            "Bonsai Tree" -> R.drawable.bonsai
+                            "Cherry Blossom" -> R.drawable.cherryblossoms
+                            "Palm Tree" -> R.drawable.palmtree
+                            "Venus Flytrap" -> R.drawable.venusflytrap
+
+                            // Spin Wheel seeds
+                            "Trumpet Flower" -> R.drawable.trumpetflower
+                            "Blue Rose" -> R.drawable.bluerose
+                            "Crystal Lotus" -> R.drawable.crystallotus
+                            "Rainbow Tulip" -> R.drawable.rainbowtulip
+
                             else -> R.drawable.sprout
                         }
                     }
+
                     else -> R.drawable.dirt
                 }
 
@@ -203,8 +305,7 @@ class HomeFragment : Fragment() {
                   Update button text depending on state
                 */
                 binding.btnChooseNewSeed.text =
-                    if (plantCompleted) "Choose New Seed"
-                    else "Pick a New Seed"
+                    if (plantCompleted) "Choose New Seed" else "Pick a New Seed"
             }
         }
 
@@ -231,7 +332,7 @@ class HomeFragment : Fragment() {
             { task ->
                 // Added by Lesley:
                 // Confirmation dialog prevents accidental deletion of tasks.
-                androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                AlertDialog.Builder(requireContext())
                     .setTitle("Delete Task")
                     .setMessage("Are you sure you want to delete this task?")
                     .setPositiveButton("Yes") { _, _ ->
@@ -242,7 +343,8 @@ class HomeFragment : Fragment() {
             }
         )
 
-        binding.taskRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.taskRecyclerView.layoutManager =
+            LinearLayoutManager(requireContext())
         binding.taskRecyclerView.adapter = adapter
 
         repository.listenToTasks { tasks ->
@@ -256,17 +358,6 @@ class HomeFragment : Fragment() {
                 repository.addTask(taskText)
                 binding.etTask.text.clear()
             }
-        }
-
-        // Opens Spin Wheel feature to unlock rare plants -paula
-        binding.btnSpinWheel.setOnClickListener {
-            val intent = Intent(requireContext(), SpinWheelActivity::class.java)
-            startActivity(intent)
-        }
-
-        // Opens shop to purchase plants using Bloom Points -paula
-        binding.btnOpenShop.setOnClickListener {
-            showShopDialog(rewardRepository)
         }
 
         refreshLimitButtons()
@@ -320,12 +411,13 @@ class HomeFragment : Fragment() {
                 toast("No incomplete tasks to swap")
                 return@setOnClickListener
             }
-            androidx.appcompat.app.AlertDialog.Builder(requireContext())
+
+            AlertDialog.Builder(requireContext())
                 .setTitle("Which task to swap? 🔀")
                 .setItems(incomplete.map { it.title }.toTypedArray()) { _, index ->
                     limitManager.useSwap(
                         onSuccess = {
-                            repository.deleteTask(incomplete[index].id)
+                            repository.deleteTask(incomplete[index])
                             repository.addTask(randomTasksFromPool(1).first())
                             refreshLimitButtons()
                             toast("Task swapped!")
@@ -374,33 +466,10 @@ class HomeFragment : Fragment() {
 
     // Generic popup for rewards and shop messages
     private fun showRewardPopup(title: String, message: String) {
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+        AlertDialog.Builder(requireContext())
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton("OK", null)
-            .show()
-    }
-
-    // Display shop items and handle purchases
-    private fun showShopDialog(rewardRepository: RewardRepository) {
-        val shopItems = rewardRepository.getShopSeeds().toList()
-
-        val itemLabels = shopItems.map {
-            "${it.first} - ${it.second} pts"
-        }.toTypedArray()
-
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("Seed Shop")
-            .setItems(itemLabels) { _, which ->
-                val selectedSeed = shopItems[which].first
-                rewardRepository.buyShopSeed(selectedSeed) { success, message ->
-                    showRewardPopup(
-                        if (success) "Shop Purchase" else "Shop",
-                        message
-                    )
-                }
-            }
-            .setNegativeButton("Close", null)
             .show()
     }
 

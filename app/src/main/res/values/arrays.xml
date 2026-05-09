@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- List of categories users can select when submitting an issue -->
+    <string-array name="issue_categories">
+        <item>Bug</item>
+        <item>Feature Request</item>
+        <item>Account/Login</item>
+        <item>Other</item>
+    </string-array>
+
+    <!-- List of priority levels for the reported issue -->
+    <string-array name="issue_priorities">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
+
+</resources>

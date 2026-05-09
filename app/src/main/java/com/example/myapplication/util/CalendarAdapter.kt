@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.util
+package com.example.myapplication.ui
 
 import android.graphics.Color
 import android.view.LayoutInflater

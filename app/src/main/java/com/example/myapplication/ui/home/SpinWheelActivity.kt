@@ -16,7 +16,7 @@ class SpinWheelActivity : AppCompatActivity() {
 
     // Spin-exclusive plants (only obtainable through the wheel)
     private val spinSeeds = listOf(
-        "Golden Sunflower",
+        "Trumpet Flower",
         "Blue Rose",
         "Crystal Lotus",
         "Rainbow Tulip"
@@ -48,47 +48,69 @@ class SpinWheelActivity : AppCompatActivity() {
         // Spin button logic
         binding.btnSpin.setOnClickListener {
 
-            // Disable button to prevent multiple spins
+            // Disable button to prevent multiple clicks
             binding.btnSpin.isEnabled = false
 
-            // Get available (not yet unlocked) spin rewards
-            rewardRepository.getAvailableSpinSeeds(spinSeeds) { availableSeeds ->
+            // Added by Lesley:
+            // Charges 200 Bloom Points every time the user spins.
+            rewardRepository.buySpin { success, message ->
 
-                // If all rewards are already unlocked
-                if (availableSeeds.isEmpty()) {
+                // If player cannot afford the spin or purchase failed
+                if (!success) {
+
                     binding.btnSpin.isEnabled = true
 
                     AlertDialog.Builder(this)
                         .setTitle("Spin Wheel")
-                        .setMessage("You already unlocked all spin-exclusive plants.")
+                        .setMessage(message)
                         .setPositiveButton("OK", null)
                         .show()
 
-                } else {
-                    // Pick a random reward from available seeds
-                    val selectedSeed = availableSeeds.random()
-                    val selectedIndex = spinSeeds.indexOf(selectedSeed)
+                    return@buySpin
+                }
 
-                    // Spin the wheel animation and land on selected index
-                    binding.spinWheelView.spinToIndex(selectedIndex) {
+                // Get available (not yet unlocked) spin rewards
+                rewardRepository.getAvailableSpinSeeds(spinSeeds) { availableSeeds ->
 
-                        // Save unlocked reward to Firestore
-                        rewardRepository.unlockSpinSeed(selectedSeed) { success ->
+                    // If all rewards are already unlocked
+                    if (availableSeeds.isEmpty()) {
 
-                            binding.btnSpin.isEnabled = true
+                        binding.btnSpin.isEnabled = true
 
-                            // Show result popup
-                            val message = if (success) {
-                                "You won: $selectedSeed"
-                            } else {
-                                "You landed on: $selectedSeed"
+                        AlertDialog.Builder(this)
+                            .setTitle("Spin Wheel")
+                            .setMessage("You already unlocked all spin-exclusive plants.")
+                            .setPositiveButton("OK", null)
+                            .show()
+
+                    } else {
+
+                        // Pick a random reward from available seeds
+                        val selectedSeed = availableSeeds.random()
+                        val selectedIndex = spinSeeds.indexOf(selectedSeed)
+
+                        // Spin the wheel animation and land on selected index
+                        binding.spinWheelView.spinToIndex(selectedIndex) {
+
+                            // Save unlocked reward to Firestore
+                            rewardRepository.unlockSpinSeed(selectedSeed) { unlockSuccess ->
+
+                                binding.btnSpin.isEnabled = true
+
+                                // Show result popup
+                                val resultMessage =
+                                    if (unlockSuccess) {
+                                        "You spent 200 Bloom Points and won: $selectedSeed"
+                                    } else {
+                                        "You spent 200 Bloom Points and landed on: $selectedSeed"
+                                    }
+
+                                AlertDialog.Builder(this)
+                                    .setTitle("Spin Result")
+                                    .setMessage(resultMessage)
+                                    .setPositiveButton("Awesome", null)
+                                    .show()
                             }
-
-                            AlertDialog.Builder(this)
-                                .setTitle("Spin Result")
-                                .setMessage(message)
-                                .setPositiveButton("Awesome", null)
-                                .show()
                         }
                     }
                 }

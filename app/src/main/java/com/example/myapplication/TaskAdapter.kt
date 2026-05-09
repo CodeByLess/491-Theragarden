@@ -1,51 +1,45 @@
 package com.example.myapplication
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myapplication.databinding.TaskItemBinding
 
 class TaskAdapter(
-    private val tasks: MutableList<Task>,
+    private var tasks: MutableList<Task>,
     private val onCheckedChange: (Task) -> Unit,
     private val onDelete: (Task) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
-    inner class TaskViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val checkBox: CheckBox = view.findViewById(R.id.checkBox)
-        val title: TextView = view.findViewById(R.id.tvTitle)
-    }
+    class TaskViewHolder(val binding: TaskItemBinding) :
+        RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.task_item, parent, false)
-        return TaskViewHolder(view)
+        val binding = TaskItemBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return TaskViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
         val task = tasks[position]
 
-        holder.title.text = task.title
-        holder.checkBox.setOnCheckedChangeListener(null)
-        holder.checkBox.isChecked = task.completed
+        holder.binding.checkboxTask.text = task.title
+        holder.binding.checkboxTask.isChecked = task.completed
 
-        holder.checkBox.setOnCheckedChangeListener { _, _ ->
+        holder.binding.checkboxTask.setOnCheckedChangeListener { _, _ ->
             onCheckedChange(task)
         }
 
-        // Added by Lesley:
-        // Allows the user to delete a task by long pressing anywhere
-        // on the task row. The actual delete action is handled in
-        // HomeFragment so a confirmation dialog can appear first.
         holder.itemView.setOnLongClickListener {
             onDelete(task)
             true
         }
     }
 
-    override fun getItemCount() = tasks.size
+    override fun getItemCount(): Int = tasks.size
 
     fun updateTasks(newTasks: List<Task>) {
         tasks.clear()
