@@ -155,7 +155,7 @@ class HomeFragment : Fragment() {
 
         // Added by Paula Awad:
         // Shows the greeting badge on the top right based on the current time.
-        binding.txtGreetingBadge.text = getGreetingBadge()
+        binding.tvTimeBadge.text = getGreetingBadge()
 
         // Added by Paula Awad:
         // Connects Bloom Points and the Seed Shop button to RewardRepository.

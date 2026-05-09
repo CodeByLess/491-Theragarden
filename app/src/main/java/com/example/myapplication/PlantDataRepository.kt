@@ -253,21 +253,32 @@ class PlantRepository {
             val progress = if (newSubmits >= 10) 100
             else ((newSubmits / 10.0) * 100).toInt().coerceIn(0, 100)
 
+            // Added by merge fix:
+            // Gives Bloom Points only the FIRST time a plant fully blooms.
+            val plantUpdate = mutableMapOf<String, Any>(
+                "plantSubmits" to newSubmits,
+                "plantStage" to stage,
+                "bloomReached" to bloomReached,
+                "plantCompleted" to completed,
+                "plantProgress" to progress,
+
+                // Stores the user's lifetime total of completed plants
+                "completedPlants" to updatedCompletedPlants
+            )
+
+            // Added by Paula + Lesley merge:
+            // Award 100 Bloom Points once per completed plant.
+            if (completed && !wasAlreadyCompleted) {
+                plantUpdate["bloomPoints"] = FieldValue.increment(100)
+            }
+
             // Save only plant-related fields using merge
             transaction.set(
                 docRef,
-                mapOf(
-                    "plantSubmits" to newSubmits,
-                    "plantStage" to stage,
-                    "bloomReached" to bloomReached,
-                    "plantCompleted" to completed,
-                    "plantProgress" to progress,
-
-                    // Stores the user's lifetime total of completed plants
-                    "completedPlants" to updatedCompletedPlants
-                ),
+                plantUpdate,
                 SetOptions.merge()
             )
+
         }.addOnSuccessListener {
 
             /*
