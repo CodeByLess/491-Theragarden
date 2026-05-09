@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#2b1408"
@@ -34,6 +36,39 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <!-- Added by Lesley Del Cid:
+             TIME BADGE:
+             Displays GM, GA, GE, or GN depending on the current time. -->
+        <TextView
+            android:id="@+id/tvTimeBadge"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_margin="16dp"
+            android:background="@android:drawable/btn_default"
+            android:backgroundTint="#6A4FBF"
+            android:elevation="4dp"
+            android:gravity="center"
+            android:text="GM"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!--Displays Bloom Points (reward currency from tasks/blooms) -paula -->
+        <TextView
+            android:id="@+id/txtBloomPoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="16dp"
+            android:text="Bloom Points: 0"
+            android:textColor="#333333"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnProfile" />
+
+        <!-- Added by Lesley Del Cid:
              VERTICAL GROWTH METER BACKGROUND:
              This is the full background bar shown on the left side of the room.
              A separate fill view is placed inside it to simulate plant growth
@@ -45,8 +80,8 @@
             android:layout_marginStart="18dp"
             android:layout_marginBottom="24dp"
             android:background="#d7d0c9"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <!-- Added by Lesley Del Cid:
                  VERTICAL GROWTH METER FILL:
@@ -82,8 +117,8 @@
             android:layout_height="180dp"
             android:layout_marginStart="34dp"
             android:layout_marginBottom="6dp"
-            app:layout_constraintStart_toEndOf="@id/plantMeterContainer"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/plantMeterContainer">
 
             <!-- Added by Lesley Del Cid:
                  CURRENT PLANT IMAGE DISPLAY:
@@ -118,21 +153,19 @@
          FLOOR STRIP:
          This colored strip recreates the floor section from the prototype and
          visually separates the top room scene from the goals area below. -->
-
-    <!-- Added by Lesley Del Cid:
-         DAILY GOALS PANEL:
-         This rounded panel groups the task input and task list
-         into one section similar to the prototype's Daily Goals card. -->
     <View
         android:id="@+id/floorStrip"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:background="#9f684d"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintTop_toBottomOf="@id/topSceneContainer"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topSceneContainer" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Added by Lesley Del Cid:
+         DAILY GOALS PANEL:
+         This rounded panel groups the task input and task list
+         into one section similar to the prototype's Daily Goals card. -->
     <LinearLayout
         android:id="@+id/dailyGoalsPanel"
         android:layout_width="0dp"
@@ -206,6 +239,28 @@
                 android:layout_marginStart="8dp"
                 android:text="@string/add" />
         </LinearLayout>
+
+        <!--Opens Spin Wheel feature to unlock rare plants -paula -->
+        <Button
+            android:id="@+id/btnSpinWheel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="#FF9800"
+            android:text="Spin Wheel"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+
+        <!-- Opens shop to purchase plants using Bloom Points -paula -->
+        <Button
+            android:id="@+id/btnOpenShop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#4CAF50"
+            android:text="Seed Shop"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/taskRecyclerView"

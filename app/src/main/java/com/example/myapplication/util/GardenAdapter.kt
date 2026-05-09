@@ -1,17 +1,22 @@
 package com.example.myapplication.ui
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.databinding.ItemGardenPlantBinding
-import java.util.Collections // added by Les
+import java.util.Collections
 
-// adapter to display garden plants in RecyclerView // added by Les
+// Added by Lesley Del Cid:
+// Adapter that displays saved garden plants in a RecyclerView grid.
+// Also supports theme colors for plant cards and plant text.
 class GardenAdapter(
-    private val plantList: MutableList<GardenPlant> // added by Les
+    private val plantList: MutableList<GardenPlant>
 ) : RecyclerView.Adapter<GardenAdapter.GardenViewHolder>() {
 
-    // view holder for each plant item // added by Les
+    private var cardColor: Int = Color.WHITE
+    private var textColor: Int = Color.parseColor("#2B1B10")
+
     class GardenViewHolder(val binding: ItemGardenPlantBinding) :
         RecyclerView.ViewHolder(binding.root)
 
@@ -27,14 +32,27 @@ class GardenAdapter(
     override fun onBindViewHolder(holder: GardenViewHolder, position: Int) {
         val currentPlant = plantList[position]
 
-        // set plant name and image // added by Les
         holder.binding.txtPlantName.text = currentPlant.seedName
         holder.binding.imgPlant.setImageResource(currentPlant.imageResId)
+
+        // Added by Lesley Del Cid:
+        // Applies the selected theme colors to each plant card.
+        holder.binding.root.setCardBackgroundColor(cardColor)
+        holder.binding.txtPlantName.setTextColor(textColor)
     }
 
     override fun getItemCount(): Int = plantList.size
 
-    // moves a garden item to a new position after dragging // added by Les
+    // Added by Lesley Del Cid:
+    // Updates card theme colors and refreshes the garden grid.
+    fun updateTheme(newCardColor: Int, newTextColor: Int) {
+        cardColor = newCardColor
+        textColor = newTextColor
+        notifyDataSetChanged()
+    }
+
+    // Added by Lesley Del Cid:
+    // Moves a garden item to a new position after dragging.
     fun moveItem(fromPosition: Int, toPosition: Int) {
         if (fromPosition < toPosition) {
             for (i in fromPosition until toPosition) {

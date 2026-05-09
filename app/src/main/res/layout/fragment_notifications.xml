@@ -5,38 +5,58 @@
     android:background="@color/dark_gray_brown"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.notifications.NotificationsFragment">
-
-
+    tools:context=".ui.notifications.NotificationsFragment"
+    android:background="@color/dark_gray_brown"
+    android:fitsSystemWindows="true">
+    //about page title and text
+    <TextView
+        android:id="@+id/about"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:autoSizeTextType="uniform"
+        android:autoSizeMinTextSize="12sp"
+        android:autoSizeMaxTextSize="20sp"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:background="@drawable/rounded_corners"
+        android:text="@string/about"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    //Report button
     <Button
         android:id="@+id/btnReport"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="360dp"
+        android:layout_marginTop="12dp"
         android:text="Report Issue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toBottomOf="@id/btnFeedback"  />
+    //Feedback button
     <Button
         android:id="@+id/btnFeedback"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="312dp"
+        android:layout_marginTop="24dp"
         android:text="User Feedback"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toBottomOf="@id/about" />
+    //Tutorial button
     <Button
         android:id="@+id/btnTutorial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="408dp"
+        android:layout_marginTop="12dp"
         android:text="Tutorial"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/btnReport"  />
 
     <TextView
         android:id="@+id/text_notifications"
