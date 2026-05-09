@@ -99,12 +99,24 @@ class HomeFragment : Fragment() {
     }
 
     private fun showShopDialog(rewardRepository: RewardRepository) {
+
         val shopSeeds = rewardRepository.getShopSeeds()
+
+        // Added by Lesley:
+        // Internal seed names used when buying seeds.
         val seedNames = shopSeeds.keys.toTypedArray()
+
+        // Added by Lesley:
+        // Display names shown in the popup with prices included.
+        val seedDisplayNames = shopSeeds.map { (seedName, price) ->
+            "$seedName - $price Bloom Points"
+        }.toTypedArray()
 
         AlertDialog.Builder(requireContext())
             .setTitle("Seed Shop")
-            .setItems(seedNames) { _, which ->
+            .setItems(seedDisplayNames) { _, which ->
+
+                // Uses the original seed name internally
                 val selectedSeed = seedNames[which]
 
                 rewardRepository.buyShopSeed(selectedSeed) { _, message ->
@@ -226,19 +238,41 @@ class HomeFragment : Fragment() {
                     the selected seed.
                 */
                 val imageRes = when (plantStage.lowercase()) {
+
                     "dirt" -> R.drawable.dirt
+
                     "sprout" -> R.drawable.sprout
+
+                    // Added by Lesley:
+                    // Uses a unique bloom image for each unlocked seed.
                     "bloom" -> {
+
                         when (currentSeedId) {
+
+                            // Starter seeds
                             "Sunflower Seed" -> R.drawable.sunflower
                             "Strawberry Seed" -> R.drawable.strawberry
                             "Lavender Seed" -> R.drawable.lavender
                             "Tulip Seed" -> R.drawable.tulip
                             "Cactus Seed" -> R.drawable.cactus
                             "Monstera Seed" -> R.drawable.monstera
+
+                            // Shop seeds
+                            "Bonsai Tree" -> R.drawable.bonsai
+                            "Cherry Blossom" -> R.drawable.cherryblossoms
+                            "Palm Tree" -> R.drawable.palmtree
+                            "Venus Flytrap" -> R.drawable.venusflytrap
+
+                            // Spin Wheel seeds
+                            "Trumpet Flower" -> R.drawable.trumpetflower
+                            "Blue Rose" -> R.drawable.bluerose
+                            "Crystal Lotus" -> R.drawable.crystallotus
+                            "Rainbow Tulip" -> R.drawable.rainbowtulip
+
                             else -> R.drawable.sprout
                         }
                     }
+
                     else -> R.drawable.dirt
                 }
 

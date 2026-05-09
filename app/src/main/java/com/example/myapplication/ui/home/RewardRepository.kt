@@ -199,6 +199,47 @@ class RewardRepository {
         }
     }
 
+    // Added by Lesley:
+    // Charges 200 Bloom Points every time the user spins the wheel.
+    fun buySpin(onResult: (Boolean, String) -> Unit) {
+
+        val ref = userRef() ?: run {
+            onResult(false, "User not signed in.")
+            return
+        }
+
+        val spinPrice = 200
+
+        ref.get().addOnSuccessListener { document ->
+
+            val currentPoints =
+                document.getLong("bloomPoints")?.toInt() ?: 0
+
+            // Not enough Bloom Points
+            if (currentPoints < spinPrice) {
+                onResult(false, "You need 200 Bloom Points to spin.")
+                return@addOnSuccessListener
+            }
+
+            // Remove 200 points
+            ref.update(
+                "bloomPoints",
+                currentPoints - spinPrice
+            ).addOnSuccessListener {
+
+                onResult(true, "Spin purchased.")
+
+            }.addOnFailureListener {
+
+                onResult(false, "Could not purchase spin.")
+            }
+
+        }.addOnFailureListener {
+
+            onResult(false, "Could not load Bloom Points.")
+        }
+    }
+
     // Return shop items and their prices
     fun getShopSeeds(): Map<String, Int> {
         return mapOf(

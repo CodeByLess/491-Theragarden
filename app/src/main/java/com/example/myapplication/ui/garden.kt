@@ -221,12 +221,27 @@ class garden : Fragment() {
     // Maps plant names from Firestore to their drawable images.
     private fun getPlantImage(seedName: String): Int {
         return when (seedName) {
+
+            // Starter seeds
             "Sunflower Seed" -> R.drawable.sunflower
             "Strawberry Seed" -> R.drawable.strawberry
             "Lavender Seed" -> R.drawable.lavender
             "Tulip Seed" -> R.drawable.tulip
             "Cactus Seed" -> R.drawable.cactus
             "Monstera Seed" -> R.drawable.monstera
+
+            // Shop seeds
+            "Bonsai Tree" -> R.drawable.bonsai
+            "Cherry Blossom" -> R.drawable.cherryblossoms
+            "Palm Tree" -> R.drawable.palmtree
+            "Venus Flytrap" -> R.drawable.venusflytrap
+
+            // Spin Wheel seeds
+            "Trumpet Flower" -> R.drawable.trumpetflower
+            "Blue Rose" -> R.drawable.bluerose
+            "Crystal Lotus" -> R.drawable.crystallotus
+            "Rainbow Tulip" -> R.drawable.rainbowtulip
+
             else -> R.drawable.dirt
         }
     }
