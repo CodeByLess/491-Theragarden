@@ -13,14 +13,19 @@ import androidx.core.view.WindowInsetsCompat
   - Final screen in the guided stretches flow
   - Provides:
       * Back: returns to the previous screen in the flow
-      * Submit: records completion by incrementing the user's completedGoals in Firestore
-        and then returns the user to the Dashboard tab in MainActivity
+      * Submit:
+          1) increments the user's completedGoals in Firestore
+          2) increments plant growth submit count (plantSubmits) to update plant stage/progress
+          3) returns the user to the Dashboard tab in MainActivity
   - Note: There is no "Next" button here because this is the last stretch screen.
 */
 class Stretch4 : AppCompatActivity() {
 
     // Repository that handles Firestore updates for goal tracking (completedGoals)
     private val goalsRepository = GoalsRepository()
+
+    // Repository responsible for updating plant growth when the user submits a completed activity
+    private val plantRepository = PlantRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,12 +45,19 @@ class Stretch4 : AppCompatActivity() {
 
         // SUBMIT BUTTON:
         // 1) Increment completedGoals in Firestore (Goal Tracker)
-        // 2) If successful, restart MainActivity and open the Dashboard tab
+        // 2) Increment plantSubmits in Firestore (Plant Growth Tracker)
+        // 3) If successful, restart MainActivity and open the Dashboard tab
         //    - Clearing the task prevents the user from navigating back into stretch screens
         val submitButton = findViewById<Button>(R.id.btnSubmit)
         submitButton.setOnClickListener {
             goalsRepository.incrementGoals { success ->
                 if (success) {
+
+                    // Added by Lesley Del Cid:
+                    // Each successful submit also contributes to plant growth.
+                    // PlantRepository handles stage thresholds (5 submits → sprout, 10 → bloom, 15 → complete).
+                    plantRepository.incrementPlantSubmits { /* UI updates via Home snapshot listener */ }
+
                     val intent = Intent(this, MainActivity::class.java).apply {
                         // Start MainActivity as a fresh task
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

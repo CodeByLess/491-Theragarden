@@ -12,6 +12,7 @@ import com.example.myapplication.Feedback
 import com.example.myapplication.Links
 import com.example.myapplication.Report
 import com.example.myapplication.Tutorial
+import com.example.myapplication.SubmitIssueActivity
 import com.example.myapplication.databinding.FragmentNotificationsBinding
 
 class NotificationsFragment : Fragment() {
@@ -48,7 +49,10 @@ class NotificationsFragment : Fragment() {
         }
         binding.btnReport.setOnClickListener {
             val intent = Intent(requireContext(), Report::class.java)
-            startActivity(intent)
+            binding.btnReport.setOnClickListener {
+                val intent = Intent(requireContext(), SubmitIssueActivity::class.java)
+                startActivity(intent)
+            }
         }
         binding.btnTutorial.setOnClickListener {
             val intent = Intent(requireContext(), Tutorial::class.java)
