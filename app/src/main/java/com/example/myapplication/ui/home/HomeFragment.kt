@@ -1,17 +1,16 @@
 package com.example.myapplication.ui.home
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import androidx.core.graphics.toColorInt
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.app.AlertDialog
 import com.example.myapplication.Profile
 import com.example.myapplication.R
 import com.example.myapplication.TaskAdapter
@@ -36,7 +35,6 @@ import java.util.Calendar
 */
 class HomeFragment : Fragment() {
 
-    // View binding reference for accessing UI elements
     private var _binding: FragmentHomeBinding? = null
 
     /*Added by Lesley Del Cid:
@@ -51,18 +49,15 @@ class HomeFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    // Inflate the layout and initialize binding
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         val homeViewModel =
-            ViewModelProvider(this)[HomeViewModel::class.java]
+            ViewModelProvider(this).get(HomeViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
-
         val root: View = binding.root
 
         val textView: TextView = binding.textHome
@@ -92,7 +87,34 @@ class HomeFragment : Fragment() {
         }
     }
 
-    // Main UI setup and logic
+    private fun getGreetingBadge(): String {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+
+        return when (hour) {
+            in 5..11 -> "GM"
+            in 12..16 -> "GA"
+            in 17..20 -> "GE"
+            else -> "GN"
+        }
+    }
+
+    private fun showShopDialog(rewardRepository: RewardRepository) {
+        val shopSeeds = rewardRepository.getShopSeeds()
+        val seedNames = shopSeeds.keys.toTypedArray()
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Seed Shop")
+            .setItems(seedNames) { _, which ->
+                val selectedSeed = seedNames[which]
+
+                rewardRepository.buyShopSeed(selectedSeed) { _, message ->
+                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -102,6 +124,50 @@ class HomeFragment : Fragment() {
         binding.btnProfile.setOnClickListener {
             val intent = Intent(requireContext(), Profile::class.java)
             startActivity(intent)
+        }
+
+        // Added by Paula Awad:
+        // Opens the Spin Wheel reward system from the Home screen.
+        binding.btnSpinWheel.setOnClickListener {
+            rewardRepository.isSpinWheelUnlocked { unlocked ->
+                if (unlocked) {
+                    val intent = Intent(requireContext(), SpinWheelActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Unlock Spin Wheel")
+                        .setMessage("The Spin Wheel costs 200 Bloom Points to unlock. Do you want to buy it?")
+                        .setPositiveButton("Buy") { _, _ ->
+                            rewardRepository.buySpinWheelAccess { success, message ->
+                                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+
+                                if (success) {
+                                    val intent = Intent(requireContext(), SpinWheelActivity::class.java)
+                                    startActivity(intent)
+                                }
+                            }
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+                }
+            }
+        }
+
+        // Added by Paula Awad:
+        // Shows the greeting badge on the top right based on the current time.
+        binding.txtGreetingBadge.text = getGreetingBadge()
+
+        // Added by Paula Awad:
+        // Connects Bloom Points and the Seed Shop button to RewardRepository.
+
+        rewardRepository.listenToBloomPoints { points ->
+            if (_binding != null) {
+                binding.txtBloomPoints.text = "🌸 Bloom Points: $points"
+            }
+        }
+
+        binding.btnOpenShop.setOnClickListener {
+            showShopDialog(rewardRepository)
         }
 
         /*Added by Lesley Del Cid:
@@ -140,7 +206,6 @@ class HomeFragment : Fragment() {
                 val plantProgress = snapshot?.getLong("plantProgress")?.toInt() ?: 0
                 binding.plantProgressBar.progress = plantProgress
                 updateVerticalPlantMeter(plantProgress)
-
                 val plantCompleted = snapshot?.getBoolean("plantCompleted") ?: false
                 val plantStage = snapshot?.getString("plantStage") ?: "dirt"
 
@@ -162,9 +227,7 @@ class HomeFragment : Fragment() {
                 */
                 val imageRes = when (plantStage.lowercase()) {
                     "dirt" -> R.drawable.dirt
-
                     "sprout" -> R.drawable.sprout
-
                     "bloom" -> {
                         when (currentSeedId) {
                             "Sunflower Seed" -> R.drawable.sunflower
@@ -176,7 +239,6 @@ class HomeFragment : Fragment() {
                             else -> R.drawable.sprout
                         }
                     }
-
                     else -> R.drawable.dirt
                 }
 
@@ -202,8 +264,7 @@ class HomeFragment : Fragment() {
                   Update button text depending on state
                 */
                 binding.btnChooseNewSeed.text =
-                    if (plantCompleted) "Choose New Seed"
-                    else "Pick a New Seed"
+                    if (plantCompleted) "Choose New Seed" else "Pick a New Seed"
             }
         }
 
@@ -213,9 +274,7 @@ class HomeFragment : Fragment() {
           - Milestone popups are handled globally in MainActivity.
         */
         binding.btnChooseNewSeed.setOnClickListener {
-            val intent =
-                Intent(requireContext(), com.example.myapplication.Seeds::class.java)
-
+            val intent = Intent(requireContext(), com.example.myapplication.Seeds::class.java)
             startActivity(intent)
         }
 
@@ -228,11 +287,9 @@ class HomeFragment : Fragment() {
         // Long pressing a task opens a confirmation dialog before deletion.
         val adapter = TaskAdapter(
             mutableListOf(),
-
             { task ->
                 repository.toggleTask(task)
             },
-
             { task ->
                 // Added by Lesley:
                 // Confirmation dialog prevents accidental deletion of tasks.
@@ -249,10 +306,8 @@ class HomeFragment : Fragment() {
 
         binding.taskRecyclerView.layoutManager =
             LinearLayoutManager(requireContext())
-
         binding.taskRecyclerView.adapter = adapter
 
-        // Listen for task updates and refresh UI
         repository.listenToTasks { tasks ->
             adapter.updateTasks(tasks)
         }
@@ -265,91 +320,13 @@ class HomeFragment : Fragment() {
                 binding.etTask.text.clear()
             }
         }
-
-        // Open spin wheel activity
-        binding.btnSpinWheel.setOnClickListener {
-            val intent =
-                Intent(requireContext(), SpinWheelActivity::class.java)
-
-            startActivity(intent)
-        }
-
-        // Open shop dialog
-        binding.btnOpenShop.setOnClickListener {
-            showShopDialog(rewardRepository)
-        }
     }
 
-    // Update badge (GM, GA, GE, GN) based on current time
-    override fun onResume() {
-        super.onResume()
-        setTimeBadge()
-    }
-
-    private fun setTimeBadge() {
-        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-
-        val (badgeText, badgeColor) = when (hour) {
-            in 5..11 -> "GM" to "#6A4FBF"   // Morning
-            in 12..16 -> "GA" to "#4CAF50" // Afternoon
-            in 17..20 -> "GE" to "#FF9800" // Evening
-            else -> "GN" to "#3F51B5"      // Night
-        }
-
-        binding.tvTimeBadge.text = badgeText
-
-        binding.tvTimeBadge.backgroundTintList =
-            ColorStateList.valueOf(badgeColor.toColorInt())
-    }
-
-    // Generic popup for rewards and shop messages
-    private fun showRewardPopup(title: String, message: String) {
-        AlertDialog.Builder(requireContext())
-            .setTitle(title)
-            .setMessage(message)
-            .setPositiveButton("OK", null)
-            .show()
-    }
-
-    // Display shop items and handle purchases
-    private fun showShopDialog(rewardRepository: RewardRepository) {
-
-        val shopItems =
-            rewardRepository.getShopSeeds().toList()
-
-        val itemLabels =
-            shopItems.map {
-                "${it.first} - ${it.second} pts"
-            }.toTypedArray()
-
-        AlertDialog.Builder(requireContext())
-            .setTitle("Seed Shop")
-
-            .setItems(itemLabels) { _, which ->
-
-                val selectedSeed =
-                    shopItems[which].first
-
-                rewardRepository.buyShopSeed(selectedSeed) { success, message ->
-
-                    showRewardPopup(
-                        if (success) "Shop Purchase" else "Shop",
-                        message
-                    )
-                }
-            }
-
-            .setNegativeButton("Close", null)
-            .show()
-    }
-
-    // Prevent memory leaks by clearing binding
     override fun onDestroyView() {
         super.onDestroyView()
 
         goalsListener?.remove()
         goalsListener = null
-
         _binding = null
     }
 }

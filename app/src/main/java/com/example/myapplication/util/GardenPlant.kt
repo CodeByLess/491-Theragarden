@@ -1,9 +1,9 @@
 package com.example.myapplication.ui
 
-// data class representing one plant in the user's garden // added by Les
+// Added by Lesley Del Cid
 data class GardenPlant(
-    val documentId: String = "", // added by Les
+    val documentId: String = "",
     val seedName: String = "",
     val imageResId: Int = 0,
-    val order: Int = 0 // added by Les
+    val order: Int = 0
 )

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#2b1408"
@@ -19,11 +17,11 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#f5efe9"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/floorStrip"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_percent="0.42">
+        app:layout_constraintHeight_percent="0.42"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <Button
             android:id="@+id/btnProfile"
@@ -120,9 +118,10 @@
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:background="#9f684d"
-        app:layout_constraintTop_toBottomOf="@id/topSceneContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/topSceneContainer" />
 
     <!-- Daily goals panel -->
     <LinearLayout
@@ -188,6 +187,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="@string/add" />
+
         </LinearLayout>
 
         <!-- Added by Paula / adjusted by Lesley:
