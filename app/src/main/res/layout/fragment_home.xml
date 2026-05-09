@@ -38,8 +38,8 @@
             android:id="@+id/txtBloomPoints"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
             android:text="Bloom Points: 0"
             android:textColor="#333333"
             android:textSize="16sp"
@@ -119,7 +119,6 @@
         android:layout_height="48dp"
         android:background="#9f684d"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/topSceneContainer" />
 
@@ -138,10 +137,10 @@
         android:paddingTop="8dp"
         android:paddingEnd="8dp"
         android:paddingBottom="6dp"
-        app:layout_constraintTop_toBottomOf="@id/floorStrip"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/floorStrip">
 
         <TextView
             android:id="@+id/txtDailyGoalsTitle"
@@ -190,6 +189,46 @@
 
         </LinearLayout>
 
+        <!-- ACTION BUTTONS ROW - Annette -->
+        <LinearLayout
+            android:id="@+id/layoutActionButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnRegen"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:text="🔄 Regen (1)"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btnSwap"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:text="🔀 Swap (2)"
+                android:textSize="11sp" />
+
+            <Button
+                android:id="@+id/btnQuickTask"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:text="⚡ Quick (3)"
+                android:textSize="11sp" />
+        </LinearLayout>
+
         <!-- Added by Paula / adjusted by Lesley:
              Spin Wheel and Seed Shop buttons now share the same row. -->
         <LinearLayout
@@ -203,8 +242,8 @@
                 android:id="@+id/btnSpinWheel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginEnd="4dp"
+                android:layout_weight="1"
                 android:backgroundTint="#FF9800"
                 android:text="Spin Wheel"
                 android:textAllCaps="false"
@@ -214,8 +253,8 @@
                 android:id="@+id/btnOpenShop"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginStart="4dp"
+                android:layout_weight="1"
                 android:backgroundTint="#4CAF50"
                 android:text="Seed Shop"
                 android:textAllCaps="false"
@@ -230,20 +269,20 @@
             android:layout_marginTop="8dp"
             android:layout_weight="1"
             android:clipToPadding="false"
-            android:paddingBottom="30dp"
-            android:overScrollMode="never" />
+            android:overScrollMode="never"
+            android:paddingBottom="30dp" />
 
     </LinearLayout>
 
-    <!-- Hidden debug text -->
+    <!-- HIDDEN DEBUG VIEWS - kept so existing Kotlin IDs do not break -->
     <TextView
         android:id="@+id/text_home"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/txtCompletedGoals"
@@ -251,9 +290,9 @@
         android:layout_height="wrap_content"
         android:text="Goals completed: 0"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/txtCompletedPlants"
@@ -261,9 +300,9 @@
         android:layout_height="wrap_content"
         android:text="Plants completed: 0"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/txtCurrentPlant"
@@ -271,9 +310,9 @@
         android:layout_height="wrap_content"
         android:text="Current plant: None"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/txtPlantStage"
@@ -281,10 +320,11 @@
         android:layout_height="wrap_content"
         android:text="Stage: dirt"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- HIDDEN ORIGINAL HORIZONTAL PROGRESS BAR -->
     <ProgressBar
         android:id="@+id/plantProgressBar"
         style="?android:attr/progressBarStyleHorizontal"
@@ -293,8 +333,8 @@
         android:max="100"
         android:progress="0"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

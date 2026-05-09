@@ -57,7 +57,6 @@ class TaskRepository {
             .document(today)
 
         db.runTransaction { transaction ->
-
             val snapshot = transaction.get(dailyLogRef)
 
             val existingTasks =
@@ -97,7 +96,6 @@ class TaskRepository {
             .document(today)
 
         db.runTransaction { transaction ->
-
             val snapshot = transaction.get(dailyLogRef)
 
             val existingTasks =
@@ -149,14 +147,12 @@ class TaskRepository {
 
         val updates = if (newCompleted) {
             saveDailyLog(task)
-
             mapOf(
                 "completed" to true,
                 "completedDate" to getTodayString()
             )
         } else {
             removeFromDailyLog(task)
-
             mapOf(
                 "completed" to false,
                 "completedDate" to null
@@ -183,13 +179,35 @@ class TaskRepository {
     }
 
     /**
-     * Deletes a task permanently.
+     * Deletes a task permanently. - Annette
      */
     fun deleteTask(task: Task) {
         taskRef().document(task.id).delete()
     }
 
+    /**
+     * Deletes all incomplete tasks. - Annette
+     * Used by the Regen button to clear and replace tasks.
+     */
+    fun deleteAllIncompleteTasks(onComplete: () -> Unit) {
+        taskRef().whereEqualTo("completed", false).get()
+            .addOnSuccessListener { snapshot ->
+                val batch = db.batch()
+                snapshot.documents.forEach { batch.delete(it.reference) }
+                batch.commit().addOnSuccessListener { onComplete() }
+            }
+    }
 
+    // Count completed tasks
+    fun listenToCompletedTaskCount(onResult: (Int) -> Unit) {
+        taskRef().addSnapshotListener { snapshot, _ ->
+            val completedCount = snapshot?.documents?.count { document ->
+                document.getBoolean("completed") == true
+            } ?: 0
+
+            onResult(completedCount)
+        }
+    }
 
     /**
      * Listens for changes in dailyLogs and calculates
@@ -210,11 +228,7 @@ class TaskRepository {
                         val count = doc.getLong("completedCount") ?: 0
                         val date = doc.getString("date") ?: doc.id
 
-                        if (count > 0 && date.isNotBlank()) {
-                            date
-                        } else {
-                            null
-                        }
+                        if (count > 0 && date.isNotBlank()) date else null
                     }
                     ?.toSet()
                     ?: emptySet()
@@ -241,15 +255,11 @@ class TaskRepository {
 
                 snapshot?.documents?.forEach { doc ->
                     val date = doc.getString("date") ?: doc.id
-
-                    val tasks =
-                        doc.get("completedTasks") as? List<String> ?: emptyList()
+                    val tasks = doc.get("completedTasks") as? List<String> ?: emptyList()
 
                     for (task in tasks) {
                         val key = task.lowercase()
-
-                        habitMap.getOrPut(key) { mutableSetOf() }
-                            .add(date)
+                        habitMap.getOrPut(key) { mutableSetOf() }.add(date)
                     }
                 }
 
@@ -257,7 +267,6 @@ class TaskRepository {
 
                 for ((task, dates) in habitMap) {
                     val streak = calculateCurrentStreak(dates)
-
                     if (streak > 0) {
                         result[task] = streak
                     }

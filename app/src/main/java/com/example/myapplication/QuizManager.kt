@@ -49,6 +49,9 @@ class QuizManager (private val activity: AppCompatActivity) {
     }
 
     private fun showQuiz() {
+        if (activity.isFinishing || activity.isDestroyed) return
+        if (activity.supportFragmentManager.isStateSaved) return
+
         QuizBottomSheet.newInstance()
             .show(activity.supportFragmentManager, "QuizBottomSheet")
     }
