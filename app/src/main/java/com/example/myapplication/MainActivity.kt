@@ -8,7 +8,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -28,6 +27,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Added by Lesley Del Cid:
+        // Hides the default ActionBar so it does not
+        // cover the Home screen UI.
+        supportActionBar?.hide()
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -44,7 +48,11 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        // Added by Lesley Del Cid:
+        // Removed setupActionBarWithNavController because it brings back
+        // the top ActionBar on every bottom navigation page.
+        // setupActionBarWithNavController(navController, appBarConfiguration)
+
         navView.setupWithNavController(navController)
 
         handleOpenTab(intent, navView)
@@ -186,7 +194,6 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("Not yet", null)
             .show()
     }
-
 
     /*Added by Lesley Del Cid:
       startNewPlantCycle
