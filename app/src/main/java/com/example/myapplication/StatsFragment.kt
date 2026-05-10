@@ -6,10 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import com.example.myapplication.MoodEntry
 import com.example.myapplication.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+
+data class MoodEntry(
+    val id: String = "",
+    val mood: String = "",
+    val createdAt: Long = 0L
+)
 
 class StatsFragment : Fragment() {
 

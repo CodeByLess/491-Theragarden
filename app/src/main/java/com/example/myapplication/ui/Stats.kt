@@ -1,4 +1,3 @@
-```kotlin
 package com.example.myapplication.ui
 
 import android.os.Bundle
@@ -10,7 +9,6 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.myapplication.MoodEntry
 import com.example.myapplication.R
 import com.example.myapplication.TaskRepository
 import com.example.myapplication.databinding.FragmentStatsBinding
@@ -27,6 +25,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+
+// Added by Lesley Del Cid:
+// Represents one saved mood entry from Firestore.
+data class MoodEntry(
+    val id: String = "",
+    val mood: String = "",
+    val createdAt: Long = 0L
+)
+
 
 // Added by Lesley Del Cid:
 // Stats Fragment handles the interactive statistics screen.
@@ -671,4 +678,4 @@ class Stats : Fragment() {
         _binding = null
     }
 }
-```
+

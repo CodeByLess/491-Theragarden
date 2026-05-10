@@ -14,8 +14,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.myapplication.Profile
 import com.example.myapplication.R
-import com.example.myapplication.RewardRepository
-import com.example.myapplication.SpinWheelActivity
+import com.example.myapplication.ui.home.RewardRepository
+import com.example.myapplication.ui.home.SpinWheelActivity
 import com.example.myapplication.TaskAdapter
 import com.example.myapplication.TaskRepository
 import com.example.myapplication.databinding.FragmentHomeBinding
