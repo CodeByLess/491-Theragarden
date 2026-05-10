@@ -1,5 +1,6 @@
 package com.example.myapplication.ui
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -10,6 +11,11 @@ import java.util.Collections
 class GardenAdapter(
     private val plantList: MutableList<GardenPlant>
 ) : RecyclerView.Adapter<GardenAdapter.GardenViewHolder>() {
+
+    // Added by Lesley Del Cid:
+    // Stores the current card and text colors for the Garden theme.
+    private var cardColor: Int = Color.WHITE
+    private var textColor: Int = Color.parseColor("#2B1B10")
 
     class GardenViewHolder(val binding: ItemGardenPlantBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -28,6 +34,11 @@ class GardenAdapter(
 
         holder.binding.txtPlantName.text = currentPlant.seedName
         holder.binding.imgPlant.setImageResource(currentPlant.imageResId)
+
+        // Added by Lesley Del Cid:
+        // Applies the selected theme colors to each plant card.
+        holder.binding.root.setCardBackgroundColor(cardColor)
+        holder.binding.txtPlantName.setTextColor(textColor)
     }
 
     override fun getItemCount(): Int = plantList.size
@@ -45,8 +56,11 @@ class GardenAdapter(
         }
         notifyItemMoved(fromPosition, toPosition)
     }
+
     // Added by Lesley Del Cid
     fun updateTheme(cardColor: Int, textColor: Int) {
+        this.cardColor = cardColor
+        this.textColor = textColor
         notifyDataSetChanged()
     }
 }

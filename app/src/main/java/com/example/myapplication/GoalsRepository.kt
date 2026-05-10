@@ -31,8 +31,14 @@ class GoalsRepository {
     fun incrementGoals(onDone: (Boolean) -> Unit) {
 
         // Get the currently logged-in user's UID.
-        // If no user is logged in, exit early.
-        val uid = auth.currentUser?.uid ?: return
+        // Added by Lesley Del Cid:
+        // If no user is logged in, return false through the callback
+        // instead of silently exiting.
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            onDone(false)
+            return
+        }
 
         // Reference to users/{uid} document
         val docRef = db.collection("users").document(uid)

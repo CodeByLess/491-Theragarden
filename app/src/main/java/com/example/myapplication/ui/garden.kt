@@ -88,23 +88,118 @@ class garden : Fragment() {
         val themeNames = arrayOf(
             "Forest Theme",
             "Lavender Theme",
-            "Sunset Theme"
+            "Sunset Theme",
+            "Mix & Match Theme"
         )
 
         val themeKeys = arrayOf(
             "forest",
             "lavender",
-            "sunset"
+            "sunset",
+            "mix"
         )
 
         AlertDialog.Builder(requireContext())
             .setTitle("Choose Garden Theme")
             .setItems(themeNames) { _, which ->
                 val selectedThemeKey = themeKeys[which]
+
+                // Added by Lesley Del Cid:
+                // Opens preset mix-and-match theme builder.
+                if (selectedThemeKey == "mix") {
+                    showMixAndMatchThemeDialog()
+                    return@setItems
+                }
+
                 val selectedTheme = getGardenTheme(selectedThemeKey)
 
                 applyGardenTheme(selectedTheme)
                 saveSelectedTheme(selectedThemeKey)
+            }
+            .show()
+    }
+
+    // Added by Lesley Del Cid:
+    // Lets the user mix preset background, card, and button colors.
+    // This avoids invalid hex input and makes the custom theme safer.
+    private fun showMixAndMatchThemeDialog() {
+        val backgroundNames = arrayOf(
+            "Forest Brown",
+            "Lavender Purple",
+            "Sunset Brown"
+        )
+
+        val backgroundColors = arrayOf(
+            "#2B1B10",
+            "#2B1B3A",
+            "#3A1F12"
+        )
+
+        val cardNames = arrayOf(
+            "White",
+            "Soft Pink",
+            "Cream"
+        )
+
+        val cardColors = arrayOf(
+            "#FFFFFF",
+            "#F8BBD0",
+            "#FFE0B2"
+        )
+
+        val buttonNames = arrayOf(
+            "Purple",
+            "Green",
+            "Orange"
+        )
+
+        val buttonColors = arrayOf(
+            "#6B4BB8",
+            "#455C34",
+            "#D96C3B"
+        )
+
+        var selectedBackground = backgroundColors[0]
+        var selectedCard = cardColors[0]
+        var selectedButton = buttonColors[0]
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Choose Background Color")
+            .setItems(backgroundNames) { _, backgroundIndex ->
+                selectedBackground = backgroundColors[backgroundIndex]
+
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Choose Plant Card Color")
+                    .setItems(cardNames) { _, cardIndex ->
+                        selectedCard = cardColors[cardIndex]
+
+                        AlertDialog.Builder(requireContext())
+                            .setTitle("Choose Button Color")
+                            .setItems(buttonNames) { _, buttonIndex ->
+                                selectedButton = buttonColors[buttonIndex]
+
+                                val textColor = "#2B1B10"
+
+                                val mixedTheme = GardenTheme(
+                                    name = "mix",
+                                    backgroundColor = Color.parseColor(selectedBackground),
+                                    cardColor = Color.parseColor(selectedCard),
+                                    buttonColor = Color.parseColor(selectedButton),
+                                    textColor = Color.parseColor(textColor)
+                                )
+
+                                applyGardenTheme(mixedTheme)
+
+                                saveMixedTheme(
+                                    selectedBackground,
+                                    selectedCard,
+                                    selectedButton,
+                                    textColor
+                                )
+                            }
+                            .show()
+                    }
+                    .show()
             }
             .show()
     }
@@ -170,6 +265,30 @@ class garden : Fragment() {
     }
 
     // Added by Lesley Del Cid:
+    // Saves the user's mixed preset Garden theme colors to Firestore.
+    private fun saveMixedTheme(
+        backgroundHex: String,
+        cardHex: String,
+        buttonHex: String,
+        textHex: String
+    ) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        val mixedThemeData = mapOf(
+            "gardenTheme" to "mix",
+            "customBackgroundColor" to backgroundHex,
+            "customCardColor" to cardHex,
+            "customButtonColor" to buttonHex,
+            "customTextColor" to textHex
+        )
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .set(mixedThemeData, SetOptions.merge())
+    }
+
+    // Added by Lesley Del Cid:
     // Loads saved theme from Firestore and applies it when Garden opens.
     private fun loadSavedTheme() {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -180,7 +299,27 @@ class garden : Fragment() {
             .get()
             .addOnSuccessListener { document ->
                 val savedTheme = document.getString("gardenTheme") ?: "forest"
-                applyGardenTheme(getGardenTheme(savedTheme))
+
+                // Added by Lesley Del Cid:
+                // Loads saved mix-and-match theme colors if the user chose that option.
+                if (savedTheme == "mix") {
+                    val backgroundHex = document.getString("customBackgroundColor") ?: "#2B1B10"
+                    val cardHex = document.getString("customCardColor") ?: "#FFFFFF"
+                    val buttonHex = document.getString("customButtonColor") ?: "#6B4BB8"
+                    val textHex = document.getString("customTextColor") ?: "#2B1B10"
+
+                    val mixedTheme = GardenTheme(
+                        name = "mix",
+                        backgroundColor = Color.parseColor(backgroundHex),
+                        cardColor = Color.parseColor(cardHex),
+                        buttonColor = Color.parseColor(buttonHex),
+                        textColor = Color.parseColor(textHex)
+                    )
+
+                    applyGardenTheme(mixedTheme)
+                } else {
+                    applyGardenTheme(getGardenTheme(savedTheme))
+                }
             }
     }
 

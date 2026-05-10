@@ -445,13 +445,21 @@ class HomeFragment : Fragment() {
     // Updates button labels and disables them when limit is 0
     private fun refreshLimitButtons() {
         limitManager.getLimits { regenLeft, swapLeft, quickLeft ->
+
+            // Added by Lesley Del Cid:
+            // Firebase callbacks can finish after the Fragment view is destroyed.
+            // Use a safe binding check to prevent NullPointerException crashes.
             activity?.runOnUiThread {
-                binding.btnRegen.text = "🔄 Regen ($regenLeft)"
-                binding.btnSwap.text = "🔀 Swap ($swapLeft)"
-                binding.btnQuickTask.text = "⚡ Quick ($quickLeft)"
-                binding.btnRegen.isEnabled = regenLeft > 0
-                binding.btnSwap.isEnabled = swapLeft > 0
-                binding.btnQuickTask.isEnabled = quickLeft > 0
+
+                val safeBinding = _binding ?: return@runOnUiThread
+
+                safeBinding.btnRegen.text = "🔄 Regen ($regenLeft)"
+                safeBinding.btnSwap.text = "🔀 Swap ($swapLeft)"
+                safeBinding.btnQuickTask.text = "⚡ Quick ($quickLeft)"
+
+                safeBinding.btnRegen.isEnabled = regenLeft > 0
+                safeBinding.btnSwap.isEnabled = swapLeft > 0
+                safeBinding.btnQuickTask.isEnabled = quickLeft > 0
             }
         }
     }

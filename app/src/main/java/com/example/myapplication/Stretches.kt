@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -21,7 +22,6 @@ class Stretches : AppCompatActivity() {
 
     // Repository responsible for updating the user's "completedGoals" field in Firestore
     private val goalsRepository = GoalsRepository()
-
 
     // Repository responsible for updating plant growth when the user submits a completed activity
     private val plantRepository = PlantRepository()
@@ -57,25 +57,55 @@ class Stretches : AppCompatActivity() {
         val submitButton = findViewById<Button>(R.id.btnSubmit)
         submitButton.setOnClickListener {
 
+            // Added by merge fix:
+            // Disable button so the user cannot double-submit while Firestore is updating.
+            submitButton.isEnabled = false
+
             // Increment goals using a Firestore transaction in GoalsRepository
             goalsRepository.incrementGoals { success ->
                 if (success) {
 
                     // Each successful submit also contributes to plant growth.
-                    // PlantRepository handles stage thresholds (5 submits → sprout, 10 → bloom, 15 → complete).
-                    plantRepository.incrementPlantSubmits { /* UI updates via Home snapshot listener */ }
+                    // PlantRepository handles stage thresholds (5 submits → sprout, 10 → bloom/complete).
+                    plantRepository.incrementPlantSubmits { plantSuccess ->
 
-                    // Relaunch MainActivity as a fresh task, and tell it to open the Dashboard tab
-                    val intent = Intent(this, MainActivity::class.java).apply {
-                        // Clear old Activities so the back button won't return to this stretch screen
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        if (plantSuccess) {
 
-                        // Custom extra that MainActivity checks to navigate to a specific tab
-                        putExtra("OPEN_TAB", "DASHBOARD")
+                            // Relaunch MainActivity as a fresh task, and tell it to open the Dashboard tab
+                            val intent = Intent(this, MainActivity::class.java).apply {
+                                // Clear old Activities so the back button won't return to this stretch screen
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                                // Custom extra that MainActivity checks to navigate to a specific tab
+                                putExtra("OPEN_TAB", "DASHBOARD")
+                            }
+
+                            startActivity(intent)
+                            finish() // close this Activity so it is removed from memory / back stack
+
+                        } else {
+
+                            // Added by merge fix:
+                            // Re-enable button if plant update failed.
+                            submitButton.isEnabled = true
+                            Toast.makeText(
+                                this,
+                                "Plant progress could not be saved.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
 
-                    startActivity(intent)
-                    finish() // close this Activity so it is removed from memory / back stack
+                } else {
+
+                    // Added by merge fix:
+                    // Re-enable button if goal update failed.
+                    submitButton.isEnabled = true
+                    Toast.makeText(
+                        this,
+                        "Goal progress could not be saved.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }
