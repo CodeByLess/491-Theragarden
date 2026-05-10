@@ -12,9 +12,17 @@ class PuzzleActivity : AppCompatActivity() {
     private val tiles = mutableListOf<Int>() // numbers (0 = empty)
     private val buttons = mutableListOf<Button>() // buttons on screen
 
+    // Added by Lesley Del Cid:
+    // Helper that updates completedGoals, plant progress, and returns to Dashboard
+    private lateinit var completionHelper: SelfCareCompletionHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_puzzle)
+
+        // Added by Lesley Del Cid:
+        // Initialize reusable self-care completion helper
+        completionHelper = SelfCareCompletionHelper(this)
 
         grid = findViewById(R.id.grid)
 
@@ -33,7 +41,7 @@ class PuzzleActivity : AppCompatActivity() {
 
     private fun setupGame() {
         tiles.clear()
-        tiles.addAll(listOf(1,2,3,4,5,6,7,8,0)) // 0 is empty space
+        tiles.addAll(listOf(1, 2, 3, 4, 5, 6, 7, 8, 0)) // 0 is empty space
 
         // shuffle until it's solvable
         do {
@@ -105,10 +113,15 @@ class PuzzleActivity : AppCompatActivity() {
     }
 
     private fun checkWin() {
-        val correct = listOf(1,2,3,4,5,6,7,8,0)
+        val correct = listOf(1, 2, 3, 4, 5, 6, 7, 8, 0)
 
         if (tiles == correct) {
             Toast.makeText(this, "You solved it! 🎉", Toast.LENGTH_SHORT).show()
+
+            // Added by Lesley Del Cid:
+            // Solving the puzzle counts as completing a self-care activity.
+            // This updates completedGoals, updates plant progress, and returns user to Dashboard.
+            completionHelper.completeSelfCareActivity()
         }
     }
 

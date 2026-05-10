@@ -20,6 +20,10 @@ class Mood : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
+    // Added by Lesley Del Cid:
+    // Helper that updates completedGoals, plant progress, and returns to Dashboard
+    private lateinit var completionHelper: SelfCareCompletionHelper
+
     // UI components
     private lateinit var btnSubmit: Button
     private lateinit var btnHappy: ImageButton
@@ -38,6 +42,10 @@ class Mood : AppCompatActivity() {
         // Connection to firebase and firestore
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
+
+        // Added by Lesley Del Cid:
+        // Initialize reusable self-care completion helper
+        completionHelper = SelfCareCompletionHelper(this)
 
         // Bind UI elements
         // Connect to UI elements by their ids
@@ -151,6 +159,11 @@ class Mood : AppCompatActivity() {
 
             .addOnSuccessListener {
                 Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show()
+
+                // Added by Lesley Del Cid:
+                // After the mood is successfully saved, count this as a completed self-care activity.
+                // This updates completedGoals, updates plant progress, and returns to Dashboard.
+                completionHelper.completeSelfCareActivity()
             }
 
             .addOnFailureListener {

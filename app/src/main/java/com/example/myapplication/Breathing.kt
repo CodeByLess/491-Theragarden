@@ -73,12 +73,20 @@ class Breathing : AppCompatActivity() {
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val db by lazy { FirebaseFirestore.getInstance() }
 
+    // Added by Lesley Del Cid:
+    // Helper that updates completedGoals, plant progress, and returns to Dashboard
+    private lateinit var completionHelper: SelfCareCompletionHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Enables edge-to-edge display layout
         enableEdgeToEdge()
         setContentView(R.layout.activity_breathing)
+
+        // Added by Lesley Del Cid:
+        // Initialize reusable self-care completion helper
+        completionHelper = SelfCareCompletionHelper(this)
 
         // Connect UI elements to layout
         btnBack = findViewById(R.id.btnBack)
@@ -181,12 +189,14 @@ class Breathing : AppCompatActivity() {
                     currentStep = Step.HOLD
                     remainingMs = holdMs
                 }
+
                 Step.HOLD -> {
                     setPhase("HOLD", "Hold gently…")
                     tickDownOrReturn()
                     currentStep = Step.EXHALE
                     remainingMs = exhaleMs
                 }
+
                 Step.EXHALE -> {
                     setPhase("EXHALE", "Slowly breathe out…")
                     animateBreath(false, remainingMs)
@@ -200,8 +210,10 @@ class Breathing : AppCompatActivity() {
                     updateRound()
                 }
             }
+
             if (state == RunState.IDLE) return
         }
+
         finishSession()
     }
 
@@ -211,33 +223,54 @@ class Breathing : AppCompatActivity() {
      */
     private suspend fun tickDownOrReturn() {
         val tick = 100L
+
         while (remainingMs > 0) {
+
             while (state == RunState.PAUSED) {
                 delay(150L)
             }
+
             if (state != RunState.RUNNING) return
+
             delay(tick)
+
             remainingMs -= tick
-            val secs = ceil(remainingMs / 1000.0).toInt().coerceAtLeast(0)
+
+            val secs =
+                ceil(remainingMs / 1000.0).toInt().coerceAtLeast(0)
+
             tvPhase.text = "${phaseName()} • $secs"
         }
     }
 
     // Called when session completes successfully
     private fun finishSession() {
+
         breathingJob = null
         state = RunState.IDLE
+
+        // Save breathing completion stats to Firestore
         saveBreathingCompletionToFirestore()
+
+        // Added by Lesley Del Cid:
+        // Count completed breathing session as a completed self-care activity.
+        // This updates completedGoals, updates plant progress,
+        // and returns user to Dashboard.
+        completionHelper.completeSelfCareActivity()
+
         setPhase("Done", "Nice work. Want to go again?")
         tvRound.text = "Round $totalRounds / $totalRounds"
         updateButton()
+
         imgBreath.playAnimation()
     }
 
     // Stops session and resets values
     private fun stopAndReset(showStoppedMessage: Boolean = true) {
+
         breathingJob?.cancel()
         breathingJob = null
+
         state = RunState.IDLE
         currentRound = 0
         currentStep = Step.INHALE
@@ -249,7 +282,13 @@ class Breathing : AppCompatActivity() {
         }
 
         updateButton()
-        imgBreath.animate().scaleX(1f).scaleY(1f).setDuration(150).start()
+
+        imgBreath.animate()
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(150)
+            .start()
+
         imgBreath.playAnimation()
     }
 
@@ -260,11 +299,13 @@ class Breathing : AppCompatActivity() {
 
     // Updates button text based on current state
     private fun updateButton() {
-        btnStartStop.text = when (state) {
-            RunState.IDLE -> "Start Breathing"
-            RunState.RUNNING -> "Pause"
-            RunState.PAUSED -> "Resume"
-        }
+
+        btnStartStop.text =
+            when (state) {
+                RunState.IDLE -> "Start Breathing"
+                RunState.RUNNING -> "Pause"
+                RunState.PAUSED -> "Resume"
+            }
     }
 
     // Updates phase label and prompt text
@@ -275,6 +316,7 @@ class Breathing : AppCompatActivity() {
 
     // Returns current phase name
     private fun phaseName(): String {
+
         return when (currentStep) {
             Step.INHALE -> "INHALE"
             Step.HOLD -> "HOLD"
@@ -284,7 +326,10 @@ class Breathing : AppCompatActivity() {
 
     // Scales animation for inhale/exhale effect
     private fun animateBreath(expand: Boolean, duration: Long) {
-        val scale = if (expand) 1.20f else 0.95f
+
+        val scale =
+            if (expand) 1.20f else 0.95f
+
         imgBreath.animate()
             .scaleX(scale)
             .scaleY(scale)
@@ -294,7 +339,10 @@ class Breathing : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (state == RunState.RUNNING) pauseBreathing()
+
+        if (state == RunState.RUNNING) {
+            pauseBreathing()
+        }
     }
 
     override fun onDestroy() {
@@ -307,7 +355,9 @@ class Breathing : AppCompatActivity() {
      * Increments totalCompleted and updates lastCompleted timestamp.
      */
     private fun saveBreathingCompletionToFirestore() {
+
         val uid = auth.currentUser?.uid ?: return
+
         val data = hashMapOf(
             "lastCompleted" to FieldValue.serverTimestamp(),
             "totalCompleted" to FieldValue.increment(1)

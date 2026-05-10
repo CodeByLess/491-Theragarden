@@ -52,15 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
-        <!-- Submit text and button -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/press_submit_if_you_are_done_to_update_plant_progress"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:layout_gravity="center"
-            android:layout_marginTop="16dp"/>
+
 
     </LinearLayout>
 

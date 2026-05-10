@@ -18,6 +18,10 @@ class Sleep : AppCompatActivity() {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
+    // Added by Lesley Del Cid:
+    // Helper that updates completedGoals, plant progress, and returns to Dashboard
+    private lateinit var completionHelper: SelfCareCompletionHelper
+
     private var startTimestamp: Timestamp? = null
 
     private lateinit var adapter: SleepLogAdapter
@@ -25,6 +29,10 @@ class Sleep : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sleep)
+
+        // Added by Lesley Del Cid:
+        // Initialize reusable self-care completion helper
+        completionHelper = SelfCareCompletionHelper(this)
 
         // Back
         findViewById<Button>(R.id.btnBack).setOnClickListener { finish() }
@@ -81,6 +89,11 @@ class Sleep : AppCompatActivity() {
                 .add(log)
                 .addOnSuccessListener {
                     Toast.makeText(this, "Saved sleep log", Toast.LENGTH_SHORT).show()
+
+                    // Added by Lesley Del Cid:
+                    // After the sleep log is successfully saved, count this as a completed self-care activity.
+                    // This updates completedGoals, updates plant progress, and returns to Dashboard.
+                    completionHelper.completeSelfCareActivity()
                 }
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Save failed: ${e.message}", Toast.LENGTH_LONG).show()

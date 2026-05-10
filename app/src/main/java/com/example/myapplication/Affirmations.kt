@@ -19,10 +19,18 @@ class Affirmations : AppCompatActivity() {
     private val KEY_TEXT = "daily_text"
     private val KEY_DATE = "daily_date"
 
+    // Added by Lesley Del Cid:
+    // Helper that updates completedGoals, plant progress, and returns to Dashboard
+    private lateinit var completionHelper: SelfCareCompletionHelper
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_affirmations)
+
+        // Added by Lesley Del Cid:
+        // Initialize reusable self-care completion helper
+        completionHelper = SelfCareCompletionHelper(this)
 
         // Get UI elements
         val backButton = findViewById<Button>(R.id.btnBack)
@@ -58,6 +66,11 @@ class Affirmations : AppCompatActivity() {
                 .apply()
 
             Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show()
+
+            // Added by Lesley Del Cid:
+            // Saving an affirmation counts as completing a self-care activity.
+            // This updates completedGoals, updates plant progress, and returns user to Dashboard.
+            completionHelper.completeSelfCareActivity()
         }
 
         // Makes layout adjust for system bars

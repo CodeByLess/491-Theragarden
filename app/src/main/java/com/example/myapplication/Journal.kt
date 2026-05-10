@@ -20,6 +20,10 @@ class Journal : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
 
+    // Added by Lesley Del Cid:
+    // Helper that updates completedGoals, plant progress, and returns to Dashboard
+    private lateinit var completionHelper: SelfCareCompletionHelper
+
     private lateinit var journalAdapter: JournalAdapter
     private lateinit var etEntry: EditText
     private lateinit var btnSave: Button
@@ -35,6 +39,10 @@ class Journal : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
+        // Added by Lesley Del Cid:
+        // Initialize reusable self-care completion helper
+        completionHelper = SelfCareCompletionHelper(this)
+
         val backButton = findViewById<Button>(R.id.btnBack)
         etEntry = findViewById(R.id.etJournalEntry)
         btnSave = findViewById(R.id.btnSaveEntry)
@@ -43,16 +51,28 @@ class Journal : AppCompatActivity() {
         journalAdapter = JournalAdapter(entries) { entry ->
             showEditDialog(entry)
         }
+
         rvEntries.layoutManager = LinearLayoutManager(this)
         rvEntries.adapter = journalAdapter
 
-        backButton.setOnClickListener { finish() }
+        backButton.setOnClickListener {
+            finish()
+        }
 
         btnSave.setOnClickListener {
+
             val text = etEntry.text.toString().trim()
+
             if (text.isEmpty()) {
-                Toast.makeText(this, "Write something first :)", Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(
+                    this,
+                    "Write something first :)",
+                    Toast.LENGTH_SHORT
+                ).show()
+
             } else {
+
                 saveEntry(text)
             }
         }
@@ -60,15 +80,31 @@ class Journal : AppCompatActivity() {
         loadEntries()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+
+            val systemBars =
+                insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                systemBars.bottom
+            )
+
             insets
         }
     }
 
     private fun saveEntry(text: String) {
+
         val uid = auth.currentUser?.uid ?: run {
-            Toast.makeText(this, "You must be logged in", Toast.LENGTH_SHORT).show()
+
+            Toast.makeText(
+                this,
+                "You must be logged in",
+                Toast.LENGTH_SHORT
+            ).show()
+
             return
         }
 
@@ -81,17 +117,39 @@ class Journal : AppCompatActivity() {
             .document(uid)
             .collection("journalEntries")
             .add(entry)
+
             .addOnSuccessListener {
+
                 etEntry.setText("")
-                Toast.makeText(this, "Saved!", Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(
+                    this,
+                    "Saved!",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                // Added by Lesley Del Cid:
+                // Saving a journal entry counts as completing
+                // a self-care activity.
+                // This updates completedGoals, updates plant progress,
+                // and returns user to Dashboard.
+                completionHelper.completeSelfCareActivity()
+
                 loadEntries()
             }
+
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Save failed: ${e.message}", Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(
+                    this,
+                    "Save failed: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
     private fun loadEntries() {
+
         val uid = auth.currentUser?.uid ?: return
 
         db.collection("users")
@@ -99,11 +157,19 @@ class Journal : AppCompatActivity() {
             .collection("journalEntries")
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .get()
+
             .addOnSuccessListener { snapshot ->
+
                 entries.clear()
+
                 for (doc in snapshot.documents) {
-                    val text = doc.getString("text") ?: ""
-                    val createdAt = doc.getLong("createdAt") ?: 0L
+
+                    val text =
+                        doc.getString("text") ?: ""
+
+                    val createdAt =
+                        doc.getLong("createdAt") ?: 0L
+
                     entries.add(
                         JournalEntry(
                             id = doc.id,
@@ -112,52 +178,88 @@ class Journal : AppCompatActivity() {
                         )
                     )
                 }
+
                 journalAdapter.notifyDataSetChanged()
             }
+
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Load failed: ${e.message}", Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(
+                    this,
+                    "Load failed: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
     private fun showEditDialog(entry: JournalEntry) {
+
         val input = EditText(this)
+
         input.setText(entry.text)
         input.setSelection(input.text.length)
 
         AlertDialog.Builder(this)
             .setTitle("Edit entry")
             .setView(input)
+
             .setPositiveButton("Update") { _, _ ->
-                val newText = input.text.toString().trim()
+
+                val newText =
+                    input.text.toString().trim()
+
                 if (newText.isEmpty()) {
-                    Toast.makeText(this, "Entry cannot be empty", Toast.LENGTH_SHORT).show()
+
+                    Toast.makeText(
+                        this,
+                        "Entry cannot be empty",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
                 } else {
+
                     updateEntry(entry.id, newText)
                 }
             }
+
             .setNegativeButton("Cancel", null)
             .show()
     }
 
     private fun updateEntry(entryId: String, newText: String) {
+
         val uid = auth.currentUser?.uid ?: return
 
         db.collection("users")
             .document(uid)
             .collection("journalEntries")
             .document(entryId)
+
             .update(
                 mapOf(
                     "text" to newText,
                     "updatedAt" to System.currentTimeMillis() // optional field
                 )
             )
+
             .addOnSuccessListener {
-                Toast.makeText(this, "Updated!", Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(
+                    this,
+                    "Updated!",
+                    Toast.LENGTH_SHORT
+                ).show()
+
                 loadEntries()
             }
+
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Update failed: ${e.message}", Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(
+                    this,
+                    "Update failed: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 }

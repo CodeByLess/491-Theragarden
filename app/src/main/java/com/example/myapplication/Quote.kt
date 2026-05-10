@@ -17,10 +17,22 @@ class Quote : AppCompatActivity() {
     // HTTP client to make API requests
     private val client = OkHttpClient()
 
+    // Added by Lesley Del Cid:
+    // Helper that updates completedGoals, plant progress, and returns to Dashboard
+    private lateinit var completionHelper: SelfCareCompletionHelper
+
+    // Added by Lesley Del Cid:
+    // Tracks how many new quotes the user has requested.
+    private var quoteCount = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_quote)
+
+        // Added by Lesley Del Cid:
+        // Initialize reusable self-care completion helper
+        completionHelper = SelfCareCompletionHelper(this)
 
         // Get references to UI elements
         val backButton = findViewById<Button>(R.id.btnBack)
@@ -33,12 +45,19 @@ class Quote : AppCompatActivity() {
         // Makes layout adjust for status/navigation bars
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+
+            v.setPadding(
+                systemBars.left,
+                systemBars.top,
+                systemBars.right,
+                systemBars.bottom
+            )
+
             insets
         }
 
         // Function that calls the API and loads a new affirmation
-        fun fetchAffirmation() {
+        fun fetchAffirmation(shouldCountQuote: Boolean) {
 
             // Show loading text while waiting for response
             quoteText.text = "Loading affirmation..."
@@ -53,36 +72,74 @@ class Quote : AppCompatActivity() {
 
                 // If request fails (no internet, timeout, etc.)
                 override fun onFailure(call: Call, e: IOException) {
+
                     runOnUiThread {
+
                         quoteText.text = "Couldn’t load a quote. Try again."
-                        Toast.makeText(this@Quote, "Network error: ${e.message}", Toast.LENGTH_SHORT).show()
+
+                        Toast.makeText(
+                            this@Quote,
+                            "Network error: ${e.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
 
                 // If request succeeds
                 override fun onResponse(call: Call, response: Response) {
+
                     response.use {
 
                         // If server response isn’t successful
                         if (!it.isSuccessful) {
-                            runOnUiThread { quoteText.text = "Couldn’t load a quote. Try again." }
+
+                            runOnUiThread {
+                                quoteText.text = "Couldn’t load a quote. Try again."
+                            }
+
                             return
                         }
 
                         // Get the raw JSON string
-                        val bodyString = it.body?.string().orEmpty()
+                        val bodyString =
+                            it.body?.string().orEmpty()
 
                         // Try to extract the "affirmation" value from JSON
                         val affirmation = try {
-                            JSONObject(bodyString).optString("affirmation", "")
+
+                            JSONObject(bodyString)
+                                .optString("affirmation", "")
+
                         } catch (ex: Exception) {
+
                             ""
                         }
 
                         // Update UI on main thread
                         runOnUiThread {
-                            quoteText.text = if (affirmation.isNotBlank()) affirmation
-                            else "Couldn’t load a quote. Try again."
+
+                            quoteText.text =
+                                if (affirmation.isNotBlank()) affirmation
+                                else "Couldn’t load a quote. Try again."
+
+                            // Added by Lesley Del Cid:
+                            // The automatic quote when the screen opens does not count.
+                            // Only manually requested quotes count toward completion.
+                            if (shouldCountQuote && affirmation.isNotBlank()) {
+
+                                quoteCount++
+
+                                // Added by Lesley Del Cid:
+                                // After 3 successful new quotes, count this as a completed self-care activity.
+                                if (quoteCount >= 3) {
+
+                                    quoteCount = 0
+
+                                    // Updates completedGoals, plant progress,
+                                    // and returns user to Dashboard.
+                                    completionHelper.completeSelfCareActivity()
+                                }
+                            }
                         }
                     }
                 }
@@ -90,9 +147,13 @@ class Quote : AppCompatActivity() {
         }
 
         // Load a new quote when button is clicked
-        newQuoteButton.setOnClickListener { fetchAffirmation() }
+        newQuoteButton.setOnClickListener {
+            fetchAffirmation(shouldCountQuote = true)
+        }
 
         // Automatically load a quote when screen opens
-        fetchAffirmation()
+        // Added by Lesley Del Cid:
+        // This first quote does not count toward plant progress.
+        fetchAffirmation(shouldCountQuote = false)
     }
 }
